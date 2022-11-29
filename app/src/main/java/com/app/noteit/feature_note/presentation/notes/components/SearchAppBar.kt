@@ -1,13 +1,14 @@
 package com.app.noteit.feature_note.presentation.notes.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -20,7 +21,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchAppBar(
     modifier: Modifier = Modifier,
@@ -39,7 +39,7 @@ fun SearchAppBar(
         modifier = modifier
             .fillMaxWidth()
             .height(height = 60.dp),
-        color = MaterialTheme.colorScheme.surface
+        color = MaterialTheme.colors.secondary
     ) {
         Column() {
             TextField(
@@ -52,11 +52,11 @@ fun SearchAppBar(
                     Text(
                         modifier = Modifier.alpha(0.4F),
                         text = "Search your notes",
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = MaterialTheme.colors.onSecondary,
                     )
                 },
                 textStyle = TextStyle(
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    fontSize = MaterialTheme.typography.body1.fontSize
                 ),
                 singleLine = true,
                 leadingIcon = {
@@ -66,7 +66,7 @@ fun SearchAppBar(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search Icon",
-                            tint = MaterialTheme.colorScheme.onSurface
+                            tint = MaterialTheme.colors.onSecondary
                         )
                     }
                 },
@@ -83,7 +83,7 @@ fun SearchAppBar(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close Icon",
-                            tint = MaterialTheme.colorScheme.onSurface
+                            tint = MaterialTheme.colors.onSecondary
                         )
                     }
                 },
@@ -94,8 +94,8 @@ fun SearchAppBar(
                     onSearch = { onSearchClicked(text) }
                 ),
                 colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4F)
+                    backgroundColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colors.onSecondary.copy(alpha = 0.4F)
                 )
 
             )

@@ -10,6 +10,8 @@ import com.app.noteit.feature_note.domain.util.NoteOrder
 import com.app.noteit.feature_note.domain.util.OrderType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -24,6 +26,9 @@ class NotesViewModel @Inject constructor(
 
     private val _state = mutableStateOf(NotesState())
     val state: State<NotesState> = _state
+
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
     private var getNotesJob: Job? = null
 
@@ -45,6 +50,7 @@ class NotesViewModel @Inject constructor(
                 viewModelScope.launch {
                     notesUseCases.deleteNote(event.note)
                     recentlyDeletedNote = event.note
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "${event.note.title} deleted"))
                 }
             }
             is NotesEvent.RestoreNote -> {
@@ -61,18 +67,6 @@ class NotesViewModel @Inject constructor(
 
             is NotesEvent.GetAllNotes -> {
                 getNotes(noteOrder = NoteOrder.Date(OrderType.Descending))
-            }
-
-            is NotesEvent.UpdateNoteSelection -> {
-                _state.value = _state.value.copy(
-                    isNoteSelected = event.value
-                )
-            }
-
-            is NotesEvent.UpdateSelectedNotes -> {
-                _state.value = _state.value.copy(
-                    selectedNotesList = event.selectedNotesList
-                )
             }
 
             is NotesEvent.SearchNotes -> {
@@ -119,6 +113,10 @@ class NotesViewModel @Inject constructor(
             noteOrder = noteOrder
         )
 
+    }
+
+    sealed class UiEvent {
+        data class ShowSnackbar(val message: String) : UiEvent()
     }
 }
 

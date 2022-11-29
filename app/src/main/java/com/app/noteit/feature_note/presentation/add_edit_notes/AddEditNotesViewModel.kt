@@ -38,7 +38,11 @@ class AddEditNotesViewModel @Inject constructor(
                         _noteColor.value = note.color
 
                         _notePinned.value = _notePinned.value.copy(
-                            pinned = note.pinned
+                            isPinned = note.isPinned
+                        )
+
+                        _noteProtected.value = _noteProtected.value.copy(
+                            isProtected = note.isProtected
                         )
                     }
                 }
@@ -68,6 +72,12 @@ class AddEditNotesViewModel @Inject constructor(
 
     val notePinned: State<NoteTextFieldsState> = _notePinned
 
+    private val _noteProtected = mutableStateOf(
+        NoteTextFieldsState()
+    )
+
+    val noteProtected: State<NoteTextFieldsState> = _noteProtected
+
     private val _noteColor = mutableStateOf(Note.noteColors.get(0).toArgb())
     val noteColor: State<Int> = _noteColor
 
@@ -94,7 +104,13 @@ class AddEditNotesViewModel @Inject constructor(
 
             is AddEditNoteEvent.PinnedNote -> {
                 _notePinned.value = notePinned.value.copy(
-                    pinned = event.value
+                    isPinned = event.value
+                )
+            }
+
+            is AddEditNoteEvent.ProtectedNote -> {
+                _noteProtected.value = _noteProtected.value.copy(
+                    isProtected = event.value
                 )
             }
 
@@ -108,7 +124,8 @@ class AddEditNotesViewModel @Inject constructor(
                                 timestamp = System.currentTimeMillis(),
                                 color = noteColor.value,
                                 id = currentNoteId,
-                                pinned = notePinned.value.pinned
+                                isPinned = notePinned.value.isPinned,
+                                isProtected = noteProtected.value.isProtected
                             )
                         )
 

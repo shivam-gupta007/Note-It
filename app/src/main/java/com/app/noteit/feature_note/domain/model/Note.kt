@@ -10,12 +10,13 @@ data class Note(
     val content: String,
     val timestamp: Long,
     val color: Int,
-    val pinned: Boolean,
+    val isPinned: Boolean,
+    val isProtected: Boolean,
     @PrimaryKey val id: Int? = null
 ) {
     companion object {
         val noteColors =
-            listOf(DefaultNoteColor, LightBlue, RedOrange, LightGreen, Violet, BabyBlue, RedPink, Blue)
+            listOf(DefaultColor, BlueColor, RedOrange, Violet, BabyBlue, RedPink)
     }
 }
 

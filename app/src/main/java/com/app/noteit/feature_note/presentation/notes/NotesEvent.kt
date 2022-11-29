@@ -9,8 +9,6 @@ sealed class NotesEvent {
     object RestoreNote : NotesEvent()
     object ToggleOrderSection : NotesEvent()
     object GetAllNotes : NotesEvent()
-    data class UpdateNoteSelection(val value: Boolean) : NotesEvent()
-    data class UpdateSelectedNotes(val selectedNotesList: List<Note>) : NotesEvent()
     data class SearchNotes(val searchText: String) : NotesEvent()
     data class UpdateSearchBarState(val state: SearchBarState) : NotesEvent()
     data class UpdateSearchText(val value: String) : NotesEvent()
