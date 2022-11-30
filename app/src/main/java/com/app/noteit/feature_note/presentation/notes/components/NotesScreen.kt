@@ -17,7 +17,6 @@ import com.app.noteit.feature_note.presentation.notes.NotesViewModel
 import com.app.noteit.feature_note.presentation.notes.SearchBarState
 import com.app.noteit.feature_note.presentation.util.Screen
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 @OptIn(
     ExperimentalFoundationApi::class
@@ -29,6 +28,7 @@ fun NotesScreen(
     val state = viewModel.state.value
     val searchText = state.searchText
     val searchBarState = state.searchBarState
+    val notesListStatusState = state.isNotesListEmpty
 
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -73,12 +73,8 @@ fun NotesScreen(
                 },
                 onSearchTriggered = {
                     viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.OPENED))
-                },
-                onMenuTriggered = {
-                    scope.launch {
-                        scaffoldState.drawerState.open()
-                    }
-                })
+                }
+            )
         },
         floatingActionButton = {
             NotesScreenFab(onNoteCreated = {
@@ -90,7 +86,15 @@ fun NotesScreen(
     ) { innerPadding ->
 
         if (state.searchBarState == SearchBarState.OPENED && state.notes.isEmpty()) {
-            EmptyScreen(message = "No matching notes found 😕")
+            EmptyScreen(
+                message = "No matching notes found",
+                animationUrl = "https://assets4.lottiefiles.com/packages/lf20_CXGNxPqYqJ.json"
+            )
+        } else if(notesListStatusState){
+            EmptyScreen(
+                message = "All your notes will be shown here",
+                animationUrl = "https://assets6.lottiefiles.com/packages/lf20_Au6z826BEy.json"
+            )
         }
 
         val pinnedNotesList = state.notes.filter { note ->
@@ -120,13 +124,11 @@ fun MainTopAppBar(
     onTextChanged: (String) -> Unit,
     onCloseClicked: () -> Unit,
     onSearchClicked: (String) -> Unit,
-    onSearchTriggered: () -> Unit,
-    onMenuTriggered: () -> Unit
+    onSearchTriggered: () -> Unit
 ) {
     when (searchBarState) {
         SearchBarState.CLOSED -> {
-            NotesScreenTopAppBar(onSearchClicked = { onSearchTriggered() },
-                onMenuClicked = { onMenuTriggered() })
+            NotesScreenTopAppBar(onSearchClicked = { onSearchTriggered() })
         }
 
         SearchBarState.OPENED -> {
@@ -144,7 +146,7 @@ fun MainTopAppBar(
 
 @Composable
 fun NotesScreenTopAppBar(
-    onSearchClicked: () -> Unit, onMenuClicked: () -> Unit
+    onSearchClicked: () -> Unit
 ) {
     TopAppBar(
         title = {
@@ -181,4 +183,8 @@ fun NotesScreenFab(onNoteCreated: () -> Unit) {
     }
 }
 
+
+fun launchComposable(content: @Composable () -> Unit) {
+
+}
 

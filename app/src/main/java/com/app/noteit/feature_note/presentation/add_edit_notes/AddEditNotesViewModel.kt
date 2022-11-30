@@ -78,7 +78,7 @@ class AddEditNotesViewModel @Inject constructor(
 
     val noteProtected: State<NoteTextFieldsState> = _noteProtected
 
-    private val _noteColor = mutableStateOf(Note.noteColors.get(0).toArgb())
+    private val _noteColor = mutableStateOf(Note.noteColors[0].toArgb())
     val noteColor: State<Int> = _noteColor
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()

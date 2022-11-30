@@ -19,8 +19,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.noteit.R
 import com.app.noteit.feature_note.domain.model.Note
+import com.app.noteit.ui.theme.BlueColor
 import com.app.noteit.ui.theme.DefaultColor
 import com.app.noteit.ui.theme.DefaultNoteBgColor
+import com.app.noteit.ui.theme.NoteTextColor
 
 @Composable
 fun NoteItem(
@@ -29,6 +31,8 @@ fun NoteItem(
     cornerRadius: Dp = 10.dp,
     onClick: () -> Unit
 ) {
+    val textColor = if (Color(note.color) == DefaultColor || Color(note.color) == BlueColor) MaterialTheme.colors.onSecondary else NoteTextColor
+
     Column(
         modifier = modifier
             .padding(4.dp)
@@ -42,28 +46,28 @@ fun NoteItem(
             .padding(16.dp)
     ) {
 
-            Text(
-                text = note.title,
-                style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colors.onSecondary
-            )
+        Text(
+            text = note.title,
+            style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = textColor
+        )
 
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(10.dp)
-            )
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(10.dp)
+        )
 
-            Text(
-                text = note.content,
-                style = MaterialTheme.typography.body1,
-                maxLines = 10,
-                lineHeight = 23.sp,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colors.onSecondary
-            )
+        Text(
+            text = note.content,
+            style = MaterialTheme.typography.body1,
+            maxLines = 10,
+            lineHeight = 23.sp,
+            overflow = TextOverflow.Ellipsis,
+            color = textColor
+        )
     }
 }
 

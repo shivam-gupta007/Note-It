@@ -99,6 +99,10 @@ class NotesViewModel @Inject constructor(
                     notes = notes,
                     noteOrder = noteOrder
                 )
+
+                _state.value = _state.value.copy(
+                    isNotesListEmpty = notes.isEmpty()
+                )
             }
             .launchIn(viewModelScope)
     }

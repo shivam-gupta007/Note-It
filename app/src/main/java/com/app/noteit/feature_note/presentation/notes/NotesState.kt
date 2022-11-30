@@ -9,5 +9,6 @@ data class NotesState(
     val noteOrder: NoteOrder = NoteOrder.Date(OrderType.Descending),
     val isOrderSectionVisible: Boolean = false,
     val searchBarState: SearchBarState = SearchBarState.CLOSED,
-    val searchText: String = ""
+    val searchText: String = "",
+    val isNotesListEmpty: Boolean = false
 )

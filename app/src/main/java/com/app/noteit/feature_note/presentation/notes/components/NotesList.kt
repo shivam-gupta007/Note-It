@@ -1,7 +1,9 @@
 package com.app.noteit.feature_note.presentation.notes.components
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.PaddingValues
@@ -38,9 +40,13 @@ fun NotesList(
         state = lazyVerticalStaggeredGridState,
         modifier = Modifier
             .fillMaxWidth()
-            .animateContentSize(animationSpec = snap())
             .padding(innerPadding)
-            .padding(all = 8.dp),
+            .padding(all = 8.dp)
+            .animateContentSize(
+                animationSpec = snap(
+                    delayMillis = 100
+                )
+            ),
         flingBehavior = ScrollableDefaults.flingBehavior()
     ) {
         items(

@@ -19,6 +19,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
+import com.app.noteit.ui.theme.BlueColor
+import com.app.noteit.ui.theme.DefaultColor
+import com.app.noteit.ui.theme.NoteTextColor
 
 @Composable
 fun TransparentTextField(
@@ -31,6 +34,7 @@ fun TransparentTextField(
     fontSize: TextUnit,
     requestFocus: Boolean = false,
     textSelectionColor: Color,
+    noteBackgroundColor: Color
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -38,6 +42,8 @@ fun TransparentTextField(
         handleColor = textSelectionColor,
         backgroundColor = textSelectionColor.copy(alpha = 0.4f)
     )
+
+    val color = if (noteBackgroundColor == DefaultColor || noteBackgroundColor == BlueColor) MaterialTheme.colors.onSecondary else NoteTextColor
 
     LaunchedEffect(key1 = Unit) {
         if (requestFocus) {
@@ -52,10 +58,10 @@ fun TransparentTextField(
             value = text,
             onValueChange = onValueChange,
             singleLine = singleLine,
-            cursorBrush = SolidColor(MaterialTheme.colors.onSecondary),
+            cursorBrush = SolidColor(color),
             textStyle = textStyle.copy(
                 fontSize = fontSize,
-                color = MaterialTheme.colors.onSecondary
+                color = color
             ),
         ) { innerTextField ->
             Box(

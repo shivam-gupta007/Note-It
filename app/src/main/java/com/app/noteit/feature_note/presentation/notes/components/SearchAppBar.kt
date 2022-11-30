@@ -99,22 +99,6 @@ fun SearchAppBar(
                 )
 
             )
-
-            /*Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                FilterChip(selected = false, onClick = { *//*TODO*//* }) {
-                    Icon(imageVector = Icons.Default.Password, contentDescription = "password icon")
-                    Text(text = "Passwords")
-                }
-
-                FilterChip(selected = false, onClick = { *//*TODO*//* }) {
-                    Icon(imageVector = Icons.Default.Note, contentDescription = "note icon")
-                    Text(text = "Notes")
-                }
-            }*/
         }
     }
 }

@@ -19,6 +19,10 @@ val OnSecondaryColor = Color(0xFFFFFFFF)
 val BackgroundColor = Color(0xFF191B22)
 val DefaultNoteBgColor = Color(0xFF353535)
 
+val NoteTextColor = Color(0xFF181A21)
+
+val DialogBackgroundColor = Color(0xFF353535)
+
 
 
 
