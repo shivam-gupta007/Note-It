@@ -8,7 +8,7 @@ This app is built with Jetpack Compose, Room, Navigation Components, Kotlin Coro
 
 The aim of this project is to be open source, so that everyone can directly contribute, add comments, and suggest improvements if they wish.
 
-Try latest Quotify app Apk from [here]()
+Try latest Quotify app Apk from [here](https://github.com/shivam-gupta007/Note-It/releases/tag/v1.0.0)
 
 ## Features
 - Create password-protected notes with a 4-digit passcode
