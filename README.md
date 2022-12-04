@@ -28,10 +28,10 @@ Try latest Note It app Apk from [here](https://github.com/shivam-gupta007/Note-I
 If you've found an error in the project, please file an issue.
 
 You are welcome to submit patches by forking this project and making a pull request.
-For new features, use [discussion]() section.
+For new features, use [discussion](https://github.com/shivam-gupta007/Note-It/discussions) section.
 
 ## License
 
-Note It App is distributed under the terms of the MIT License. See the [license]() for more information.
+Note It App is distributed under the terms of the MIT License. See the [license](https://github.com/shivam-gupta007/Note-It/blob/master/LICENSE.md) for more information.
 
 
