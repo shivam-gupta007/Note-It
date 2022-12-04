@@ -109,14 +109,13 @@ class NotesViewModel @Inject constructor(
 
     private fun searchNote(searchText: String, noteOrder: NoteOrder) {
         val searchedNoteList = state.value.notes.filter { note ->
-            note.title.contains(searchText) || note.content.contains(searchText)
+            note.title.contains(searchText,true) || note.content.contains(searchText,true)
         }
 
         _state.value = state.value.copy(
             notes = searchedNoteList,
             noteOrder = noteOrder
         )
-
     }
 
     sealed class UiEvent {

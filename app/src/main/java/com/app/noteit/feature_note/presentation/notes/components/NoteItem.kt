@@ -5,8 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +34,8 @@ fun NoteItem(
     cornerRadius: Dp = 10.dp,
     onClick: () -> Unit
 ) {
-    val textColor = if (Color(note.color) == DefaultColor || Color(note.color) == BlueColor) MaterialTheme.colors.onSecondary else NoteTextColor
+    val color =
+        if (Color(note.color) == DefaultColor || Color(note.color) == BlueColor) MaterialTheme.colors.onSecondary else NoteTextColor
 
     Column(
         modifier = modifier
@@ -51,7 +55,7 @@ fun NoteItem(
             style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            color = textColor
+            color = color
         )
 
         Spacer(
@@ -60,14 +64,23 @@ fun NoteItem(
                 .height(10.dp)
         )
 
-        Text(
-            text = note.content,
-            style = MaterialTheme.typography.body1,
-            maxLines = 10,
-            lineHeight = 23.sp,
-            overflow = TextOverflow.Ellipsis,
-            color = textColor
-        )
+        if (note.isProtected) {
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = "",
+                tint = color
+            )
+        } else {
+            Text(
+                modifier = Modifier,
+                text = note.content,
+                style = MaterialTheme.typography.body1,
+                maxLines = 10,
+                lineHeight = 23.sp,
+                overflow = TextOverflow.Ellipsis,
+                color = color
+            )
+        }
     }
 }
 

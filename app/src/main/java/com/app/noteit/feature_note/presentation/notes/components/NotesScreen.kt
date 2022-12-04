@@ -31,7 +31,7 @@ fun NotesScreen(
     val notesListStatusState = state.isNotesListEmpty
 
     val scaffoldState = rememberScaffoldState()
-    val scope = rememberCoroutineScope()
+
     val lazyVerticalStaggeredGridState = rememberLazyStaggeredGridState()
 
     LaunchedEffect(key1 = true) {
@@ -51,37 +51,34 @@ fun NotesScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            MainTopAppBar(searchBarState = searchBarState,
-                searchText = searchText,
-                onTextChanged = { text ->
-                    viewModel.onEvent(NotesEvent.UpdateSearchText(text))
-                    viewModel.onEvent(NotesEvent.SearchNotes(text))
+    Scaffold(topBar = {
+        MainTopAppBar(searchBarState = searchBarState,
+            searchText = searchText,
+            onTextChanged = { text ->
+                viewModel.onEvent(NotesEvent.UpdateSearchText(text))
+                viewModel.onEvent(NotesEvent.SearchNotes(text))
 
-                    if (text.isEmpty()) {
-                        viewModel.onEvent(NotesEvent.GetAllNotes)
-                    }
-                },
-                onCloseClicked = {
-                    viewModel.onEvent(NotesEvent.UpdateSearchText(""))
-                    viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.CLOSED))
+                if (text.isEmpty()) {
                     viewModel.onEvent(NotesEvent.GetAllNotes)
-                },
-                onSearchClicked = { text ->
-                    viewModel.onEvent(NotesEvent.SearchNotes(text))
-                },
-                onSearchTriggered = {
-                    viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.OPENED))
                 }
-            )
-        },
-        floatingActionButton = {
-            NotesScreenFab(onNoteCreated = {
+            },
+            onCloseClicked = {
+                viewModel.onEvent(NotesEvent.UpdateSearchText(""))
                 viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.CLOSED))
-                navController.navigate(Screen.AddEditNotesScreen.route)
+                viewModel.onEvent(NotesEvent.GetAllNotes)
+            },
+            onSearchClicked = { text ->
+                viewModel.onEvent(NotesEvent.SearchNotes(text))
+            },
+            onSearchTriggered = {
+                viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.OPENED))
             })
-        }, backgroundColor = MaterialTheme.colors.background, scaffoldState = scaffoldState
+    }, floatingActionButton = {
+        NotesScreenFab(onNoteCreated = {
+            viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.CLOSED))
+            navController.navigate(Screen.AddEditNotesScreen.route)
+        })
+    }, backgroundColor = MaterialTheme.colors.background, scaffoldState = scaffoldState
 
     ) { innerPadding ->
 
@@ -90,7 +87,7 @@ fun NotesScreen(
                 message = "No matching notes found",
                 animationUrl = "https://assets4.lottiefiles.com/packages/lf20_CXGNxPqYqJ.json"
             )
-        } else if(notesListStatusState){
+        } else if (notesListStatusState) {
             EmptyScreen(
                 message = "All your notes will be shown here",
                 animationUrl = "https://assets6.lottiefiles.com/packages/lf20_Au6z826BEy.json"
@@ -107,8 +104,7 @@ fun NotesScreen(
 
         val sortedNotesList = pinnedNotesList.plus(unPinnedNotesList)
 
-        NotesList(
-            lazyVerticalStaggeredGridState = lazyVerticalStaggeredGridState,
+        NotesList(lazyVerticalStaggeredGridState = lazyVerticalStaggeredGridState,
             innerPadding = innerPadding,
             noteList = sortedNotesList,
             navController = navController
@@ -148,24 +144,21 @@ fun MainTopAppBar(
 fun NotesScreenTopAppBar(
     onSearchClicked: () -> Unit
 ) {
-    TopAppBar(
-        title = {
-            Text(
-                text = "Notes",
-                color = MaterialTheme.colors.onSecondary,
-                style = TextStyle(fontSize = MaterialTheme.typography.h5.fontSize)
+    TopAppBar(title = {
+        Text(
+            text = "Notes",
+            color = MaterialTheme.colors.onSecondary,
+            style = TextStyle(fontSize = MaterialTheme.typography.h5.fontSize)
+        )
+    }, backgroundColor = MaterialTheme.colors.secondary, actions = {
+        IconButton(onClick = { onSearchClicked() }) {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = "Search Icon",
+                tint = MaterialTheme.colors.onSecondary
             )
-        },
-        backgroundColor = MaterialTheme.colors.secondary,
-        actions = {
-            IconButton(onClick = { onSearchClicked() }) {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = "Search Icon",
-                    tint = MaterialTheme.colors.onSecondary
-                )
-            }
-        })
+        }
+    })
 }
 
 @Composable
@@ -181,10 +174,5 @@ fun NotesScreenFab(onNoteCreated: () -> Unit) {
             tint = MaterialTheme.colors.onPrimary,
         )
     }
-}
-
-
-fun launchComposable(content: @Composable () -> Unit) {
-
 }
 

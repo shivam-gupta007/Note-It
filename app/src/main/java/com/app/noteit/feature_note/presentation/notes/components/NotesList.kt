@@ -1,9 +1,8 @@
 package com.app.noteit.feature_note.presentation.notes.components
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,6 +34,7 @@ fun NotesList(
     viewModel: NotesViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    val TAG = "NotesList"
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(count = 2),
         state = lazyVerticalStaggeredGridState,
@@ -77,7 +77,12 @@ fun NotesList(
                         note = note,
                         onClick = {
                             viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.CLOSED))
-                            navController.navigate(Screen.AddEditNotesScreen.route + "?noteId=${note.id}&noteColor=${note.color}")
+                            if (note.isProtected) {
+                                Log.i(TAG,"noteId: ${note.id} noteColor: ${note.color}")
+                                navController.navigate(Screen.AuthenticationScreen.route + "?noteId=${note.id}&noteColor=${note.color}")
+                            } else {
+                                navController.navigate(Screen.AddEditNotesScreen.route + "?noteId=${note.id}&noteColor=${note.color}")
+                            }
                         }
                     )
                 },

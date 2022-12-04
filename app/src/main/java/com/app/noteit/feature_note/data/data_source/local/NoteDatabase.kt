@@ -1,7 +1,8 @@
-package com.app.noteit.feature_note.data.data_source
+package com.app.noteit.feature_note.data.data_source.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.app.noteit.feature_note.data.data_source.local.NoteDao
 import com.app.noteit.feature_note.domain.model.Note
 
 @Database(

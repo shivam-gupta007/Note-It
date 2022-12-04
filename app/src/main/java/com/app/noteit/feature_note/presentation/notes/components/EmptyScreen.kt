@@ -12,6 +12,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.app.noteit.feature_note.presentation.LottieAnimationItem
 
 @Composable
 fun EmptyScreen(message: String, animationUrl: String) {
@@ -20,8 +21,10 @@ fun EmptyScreen(message: String, animationUrl: String) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        FunnyLottieAnimations(
-            animationUrl = animationUrl
+        LottieAnimationItem(
+            modifier = Modifier.size(size = 300.dp),
+            animationUrl = animationUrl,
+            iterateForever = true
         )
 
         Spacer(modifier = Modifier.height(height = 5.dp))
@@ -32,19 +35,4 @@ fun EmptyScreen(message: String, animationUrl: String) {
             color = MaterialTheme.colors.onSecondary
         )
     }
-}
-
-@Composable
-fun FunnyLottieAnimations(
-    animationUrl: String
-) {
-    val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.Url(animationUrl)
-    )
-
-    LottieAnimation(
-        modifier = Modifier.size(size = 300.dp),
-        composition = composition,
-        iterations = LottieConstants.IterateForever
-    )
 }

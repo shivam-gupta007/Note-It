@@ -17,23 +17,24 @@ import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.TaskAlt
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.app.noteit.feature_note.data.data_source.preferences.PasscodeDataStore
 import com.app.noteit.feature_note.domain.model.Note
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNoteEvent
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNotesViewModel
-import com.app.noteit.ui.theme.*
+import com.app.noteit.feature_note.presentation.util.Screen
+import com.app.noteit.ui.theme.BlueColor
+import com.app.noteit.ui.theme.BrownColor
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -58,8 +59,10 @@ fun AddEditNoteScreen(
     }
 
     val isNewNote = remember { noteColor == -1 }
-
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val dataStore = PasscodeDataStore(context = context)
+    val passcode = dataStore.getPin.collectAsState(initial = "")
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -75,9 +78,6 @@ fun AddEditNoteScreen(
         }
     }
 
-    if(noteProtectedState.isProtected){
-        AuthDialog()
-    }
 
     Scaffold(
         topBar = {
@@ -87,6 +87,9 @@ fun AddEditNoteScreen(
                     viewModel.onEvent(AddEditNoteEvent.PinnedNote(value = isNotePinned))
                 },
                 onNoteProtected = { isNoteProtected ->
+                    if (passcode.value.isEmpty()) {
+                        navController.navigate(route = Screen.AuthenticationScreen.route)
+                    }
                     viewModel.onEvent(AddEditNoteEvent.ProtectedNote(value = isNoteProtected))
                 },
                 onNoteSaved = { viewModel.onEvent(AddEditNoteEvent.SaveNote) },
