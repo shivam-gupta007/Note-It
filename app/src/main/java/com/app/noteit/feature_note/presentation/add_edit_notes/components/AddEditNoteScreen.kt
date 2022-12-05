@@ -2,12 +2,15 @@ package com.app.noteit.feature_note.presentation.add_edit_notes.components
 
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -21,9 +24,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,6 +44,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AddEditNoteScreen(
     navController: NavController,
@@ -78,7 +84,6 @@ fun AddEditNoteScreen(
         }
     }
 
-
     Scaffold(
         topBar = {
             AddEditScreenTopAppBar(
@@ -107,42 +112,18 @@ fun AddEditNoteScreen(
                 .background(noteBackgroundAnimatable.value)
                 .padding(16.dp)
         ) {
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                items(items = Note.noteColors) { color ->
-                    val colorInt = color.toArgb()
-                    Box(
-                        modifier = Modifier
-                            .size(30.dp)
-                            .shadow(
-                                elevation = 10.dp,
-                                shape = CircleShape,
+            NoteColorPicker(
+                onColorPicked = { colorInt ->
+                    scope.launch {
+                        noteBackgroundAnimatable.animateTo(
+                            targetValue = Color(colorInt),
+                            animationSpec = tween(
+                                durationMillis = 500
                             )
-                            .clip(CircleShape)
-                            .background(color)
-                            .border(
-                                width = 2.dp,
-                                color = if (viewModel.noteColor.value == colorInt) Color.White else Color.Transparent,
-                                shape = CircleShape
-                            )
-                            .clickable {
-                                scope.launch {
-                                    noteBackgroundAnimatable.animateTo(
-                                        targetValue = Color(colorInt),
-                                        animationSpec = tween(
-                                            durationMillis = 500
-                                        )
-                                    )
-                                }
-                                viewModel.onEvent(AddEditNoteEvent.ChangeColor(color = colorInt))
-                            },
-                    )
+                        )
+                    }
                 }
-            }
+            )
 
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -163,7 +144,8 @@ fun AddEditNoteScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             TransparentTextField(
-                modifier = Modifier.fillMaxHeight(),
+                modifier = Modifier
+                    .fillMaxHeight(),
                 text = contentState.text,
                 hint = "Text",
                 onValueChange = {
@@ -174,6 +156,42 @@ fun AddEditNoteScreen(
                 fontSize = 16.sp,
                 textSelectionColor = if (noteBackgroundAnimatable.value == BlueColor) BrownColor else BlueColor,
                 noteBackgroundColor = noteBackgroundAnimatable.value
+            )
+        }
+    }
+}
+
+@Composable
+fun NoteColorPicker(
+    viewModel: AddEditNotesViewModel = hiltViewModel(),
+    onColorPicked: (Int) -> Unit
+) {
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        items(items = Note.noteColors) { color ->
+            val colorInt = color.toArgb()
+            Box(
+                modifier = Modifier
+                    .size(30.dp)
+                    .shadow(
+                        elevation = 10.dp,
+                        shape = CircleShape,
+                    )
+                    .clip(CircleShape)
+                    .background(color)
+                    .border(
+                        width = 2.dp,
+                        color = if (viewModel.noteColor.value == colorInt) Color.White else Color.Transparent,
+                        shape = CircleShape
+                    )
+                    .clickable {
+                        onColorPicked(colorInt)
+                        viewModel.onEvent(AddEditNoteEvent.ChangeColor(color = colorInt))
+                    },
             )
         }
     }

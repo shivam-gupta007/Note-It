@@ -67,10 +67,10 @@ fun NotesList(
                 modifier = Modifier.padding(vertical = Dp(1f)),
                 directions = setOf(
                     DismissDirection.EndToStart
-                )/*,
+                ),
                 dismissThresholds = { direction ->
-                    //FractionalThreshold(if (direction == DismissDirection.EndToStart) 0.1f else 0.05f)
-                }*/,
+                    FractionalThreshold(1f)
+                },
                 dismissContent = {
                     NoteItem(
                         modifier = Modifier,

@@ -11,9 +11,13 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,6 +29,7 @@ import com.app.noteit.feature_note.presentation.LottieAnimationItem
 import com.app.noteit.feature_note.presentation.util.Screen
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AuthenticationScreen(
     navController: NavController,
@@ -51,7 +56,7 @@ fun AuthenticationScreen(
         focusRequester1.requestFocus()
     }
 
-    Log.i(TAG,"noteId: $noteId noteColor: $noteColor")
+    Log.i(TAG, "noteId: $noteId noteColor: $noteColor")
 
     Column(
         modifier = Modifier
@@ -99,6 +104,8 @@ fun AuthenticationScreen(
                     passcodeDigit2 = it
                     if (it.isNotBlank()) {
                         focusRequester3.requestFocus()
+                    } else{
+                        focusRequester1.requestFocus()
                     }
                 }
             )
@@ -110,14 +117,23 @@ fun AuthenticationScreen(
                     passcodeDigit3 = it
                     if (it.isNotBlank()) {
                         focusRequester4.requestFocus()
+                    } else {
+                        focusRequester2.requestFocus()
                     }
                 }
             )
 
             PasscodeTextField(
-                modifier = Modifier.focusRequester(focusRequester4),
+                modifier = Modifier
+                    .focusRequester(focusRequester4),
                 value = passcodeDigit4,
-                onValueChange = { passcodeDigit4 = it })
+                onValueChange = {
+                    passcodeDigit4 = it
+                    if(it.isBlank()){
+                        focusRequester3.requestFocus()
+                    }
+                }
+            )
         }
 
         Spacer(modifier = Modifier.height(height = 10.dp))
@@ -138,7 +154,7 @@ fun AuthenticationScreen(
                     Toast.makeText(
                         context,
                         if (passcode.value == enteredPasscode) {
-                            navController.navigate(Screen.AddEditNotesScreen.route + "?noteId=${noteId}&noteColor=${noteColor}"){
+                            navController.navigate(Screen.AddEditNotesScreen.route + "?noteId=${noteId}&noteColor=${noteColor}") {
                                 popUpTo(Screen.NotesScreen.route)
                             }
                             "Passcode confirmed"
@@ -177,6 +193,6 @@ fun PasscodeTextField(
             textAlign = TextAlign.Center,
             fontSize = MaterialTheme.typography.h6.fontSize
         ),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     )
 }

@@ -8,6 +8,10 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.app.noteit.feature_note.presentation.add_edit_notes.components.AddEditNoteScreen
@@ -38,18 +42,10 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable(
                             route = Screen.NotesScreen.route,
-                            enterTransition = {
-                                fadeIn()
-                            },
-                            popEnterTransition = {
-                                fadeIn()
-                            },
-                            exitTransition = {
-                                fadeOut()
-                            },
-                            popExitTransition = {
-                                fadeOut()
-                            }
+                            enterTransition = { fadeIn() },
+                            popEnterTransition = { fadeIn() },
+                            exitTransition = { fadeOut() },
+                            popExitTransition = { fadeOut() }
                         ) {
                             NotesScreen(navController = navController)
                         }
@@ -70,18 +66,10 @@ class MainActivity : ComponentActivity() {
                                     defaultValue = -1
                                 }
                             ),
-                            enterTransition = {
-                                scaleIn()
-                            },
-                            popEnterTransition = {
-                                scaleIn()
-                            },
-                            exitTransition = {
-                                fadeOut()
-                            },
-                            popExitTransition = {
-                                fadeOut()
-                            }
+                            enterTransition = { scaleIn() },
+                            popEnterTransition = { scaleIn() },
+                            exitTransition = { fadeOut() },
+                            popExitTransition = { fadeOut() }
                         ) {
                             val color = it.arguments?.getInt("noteColor") ?: -1
                             AddEditNoteScreen(
@@ -122,12 +110,8 @@ class MainActivity : ComponentActivity() {
                                     )
                                 )
                             },
-                            exitTransition = {
-                                fadeOut()
-                            },
-                            popExitTransition = {
-                                fadeOut()
-                            }
+                            exitTransition = { fadeOut() },
+                            popExitTransition = { fadeOut() }
                         ) {
                             val color = it.arguments?.getInt("noteColor") ?: -1
                             val id = it.arguments?.getInt("noteId") ?: -1
