@@ -23,6 +23,10 @@ Try latest Note It app Apk from [here](https://github.com/shivam-gupta007/Note-I
 
 - Search your notes 
 
+## Demo
+
+https://user-images.githubusercontent.com/83108424/205564228-118dda0c-ddf7-4a1a-a852-a62b16493ea5.mp4
+
 ## Contributions
 
 If you've found an error in the project, please file an issue.
