@@ -2,7 +2,7 @@
 
 # Note It - A note-taking app
 
-An app that allows you to take notes and password-protect them with beautiful colors and an easy interface.
+An app that helps you to take notes and password-protect them with beautiful colors and an easy interface.
 
 This app is built with Jetpack Compose, Room, Navigation Components, Kotlin Coroutines, and Hilt, following the recommended [Android Architecture Guidelines](https://developer.android.com/topic/architecture).
 
