@@ -1,6 +1,7 @@
 package com.app.noteit.feature_note.presentation.add_edit_notes.components
 
 import androidx.compose.animation.Animatable
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -9,9 +10,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -24,11 +24,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,6 +37,7 @@ import com.app.noteit.feature_note.domain.model.Note
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNoteEvent
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNotesViewModel
 import com.app.noteit.feature_note.presentation.util.Screen
+import com.app.noteit.feature_note.presentation.util.UrlsIdentifier
 import com.app.noteit.ui.theme.BlueColor
 import com.app.noteit.ui.theme.BrownColor
 import kotlinx.coroutines.flow.collectLatest
@@ -63,6 +63,10 @@ fun AddEditNoteScreen(
             Color(if (noteColor != -1) noteColor else viewModel.noteColor.value)
         )
     }
+
+    /*val noteBackgroundAnimatable = remember {
+        Color(if (noteColor != -1) noteColor else viewModel.noteColor.value)
+    }*/
 
     val isNewNote = remember { noteColor == -1 }
     val scope = rememberCoroutineScope()
@@ -145,7 +149,8 @@ fun AddEditNoteScreen(
 
             TransparentTextField(
                 modifier = Modifier
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .clickable { openUrlInBrowser(contentState.text) },
                 text = contentState.text,
                 hint = "Text",
                 onValueChange = {
@@ -159,6 +164,10 @@ fun AddEditNoteScreen(
             )
         }
     }
+}
+
+fun openUrlInBrowser(text: String) {
+    val urls = UrlsIdentifier.URL_REGEX_PATTERN.toRegex().findAll(text).map { it.value }.toList()
 }
 
 @Composable

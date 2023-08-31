@@ -3,6 +3,7 @@ package com.app.noteit.feature_note.presentation.add_edit_notes.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.MaterialTheme
@@ -18,6 +19,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.TextUnit
 import com.app.noteit.ui.theme.BlueColor
 import com.app.noteit.ui.theme.DefaultColor
@@ -34,7 +36,8 @@ fun TransparentTextField(
     fontSize: TextUnit,
     requestFocus: Boolean = false,
     textSelectionColor: Color,
-    noteBackgroundColor: Color
+    noteBackgroundColor: Color,
+    keyboardOptions: KeyboardOptions = KeyboardOptions()
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -62,7 +65,7 @@ fun TransparentTextField(
             textStyle = textStyle.copy(
                 fontSize = fontSize,
                 color = color
-            ),
+            ), keyboardOptions = keyboardOptions
         ) { innerTextField ->
             Box(
                 modifier = Modifier.fillMaxWidth()
