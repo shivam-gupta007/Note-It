@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.map
 class GetNotes(
     private val repository: NoteRepository
 ) {
-    //Overrides the default invoke() method using the 'operator' keyword
     operator fun invoke(
         noteOrder: NoteOrder = NoteOrder.Date(OrderType.Descending)
     ): Flow<List<Note>> {
