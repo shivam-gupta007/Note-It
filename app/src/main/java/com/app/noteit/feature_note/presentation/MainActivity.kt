@@ -6,37 +6,32 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.app.noteit.feature_note.presentation.add_edit_notes.components.AddEditNoteScreen
 import com.app.noteit.feature_note.presentation.notes.components.NotesScreen
 import com.app.noteit.feature_note.presentation.secure_notes.AuthenticationScreen
 import com.app.noteit.feature_note.presentation.util.Screen
 import com.app.noteit.ui.theme.NoteItTheme
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             NoteItTheme {
                 Surface(
-                    color = MaterialTheme.colors.background
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberAnimatedNavController()
+                    val navController = rememberNavController()
 
-                    AnimatedNavHost(
+                    NavHost(
                         navController = navController,
                         startDestination = Screen.NotesScreen.route,
                     ) {

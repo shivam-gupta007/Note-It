@@ -1,18 +1,29 @@
 package com.app.noteit.feature_note.presentation.add_edit_notes.components
 
 import androidx.compose.animation.Animatable
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Lock
@@ -20,7 +31,13 @@ import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.TaskAlt
-import androidx.compose.runtime.*
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -31,7 +48,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.app.noteit.feature_note.data.data_source.preferences.PasscodeDataStore
 import com.app.noteit.feature_note.domain.model.Note
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNoteEvent
@@ -44,13 +61,13 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AddEditNoteScreen(
-    navController: NavController,
+    navController: NavHostController,
     noteColor: Int,
     viewModel: AddEditNotesViewModel = hiltViewModel()
 ) {
+
     val titleState = viewModel.noteTitle.value
     val contentState = viewModel.noteContent.value
     val notePinnedState = viewModel.notePinned.value
@@ -138,11 +155,12 @@ fun AddEditNoteScreen(
                     viewModel.onEvent(AddEditNoteEvent.EnteredTitle(it))
                 },
                 singleLine = true,
-                textStyle = MaterialTheme.typography.body1,
+                textStyle = MaterialTheme.typography.titleLarge,
                 fontSize = 25.sp,
                 requestFocus = isNewNote,
                 textSelectionColor = if (noteBackgroundAnimatable.value == BlueColor) BrownColor else BlueColor,
-                noteBackgroundColor = noteBackgroundAnimatable.value
+                noteBackgroundColor = noteBackgroundAnimatable.value,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -157,7 +175,7 @@ fun AddEditNoteScreen(
                     viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
                 },
                 singleLine = false,
-                textStyle = MaterialTheme.typography.body2,
+                textStyle = MaterialTheme.typography.bodyMedium,
                 fontSize = 16.sp,
                 textSelectionColor = if (noteBackgroundAnimatable.value == BlueColor) BrownColor else BlueColor,
                 noteBackgroundColor = noteBackgroundAnimatable.value
@@ -224,11 +242,11 @@ fun AddEditScreenTopAppBar(
                 Icon(
                     Icons.Filled.ArrowBack,
                     contentDescription = "Back arrow",
-                    tint = MaterialTheme.colors.onSecondary
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         },
-        backgroundColor = MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colorScheme.background,
         actions = {
             IconButton(
                 onClick = { onNoteProtected(!isNoteProtected) }
@@ -236,7 +254,7 @@ fun AddEditScreenTopAppBar(
                 Icon(
                     imageVector = if (isNoteProtected) Icons.Filled.Lock else Icons.Outlined.LockOpen,
                     contentDescription = "Protect note",
-                    tint = MaterialTheme.colors.onSecondary
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
             IconButton(
@@ -245,7 +263,7 @@ fun AddEditScreenTopAppBar(
                 Icon(
                     imageVector = if (isNotePinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
                     contentDescription = "Pin note",
-                    tint = MaterialTheme.colors.onSecondary
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
             IconButton(
@@ -254,7 +272,7 @@ fun AddEditScreenTopAppBar(
                 Icon(
                     imageVector = Icons.Outlined.TaskAlt,
                     contentDescription = "Save note",
-                    tint = MaterialTheme.colors.onSecondary
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         }

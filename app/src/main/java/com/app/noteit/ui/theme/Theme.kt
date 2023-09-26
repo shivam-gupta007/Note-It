@@ -1,39 +1,42 @@
 package com.app.noteit.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
-private val DarkColorPalette = darkColors(
+
+
+private val LightColors = lightColorScheme(
     primary = PrimaryColor,
     secondary = SecondaryColor,
     onPrimary = OnPrimaryColor,
-    onSecondary = OnSecondaryColor,
-    background = BackgroundColor,
+    onSecondary = OnSecondaryColor
 )
 
-private val LightColorPalette = lightColors(
+
+private val DarkColors = darkColorScheme(
     primary = PrimaryColor,
     secondary = SecondaryColor,
     onPrimary = OnPrimaryColor,
-    onSecondary = OnSecondaryColor,
-    background = BackgroundColor,
+    onSecondary = OnSecondaryColor
 )
+
 
 @Composable
-fun NoteItTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
+fun NoteItTheme(
+    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable() () -> Unit
+) {
+    val colors = if (!useDarkTheme) {
+        LightColors
     } else {
-        LightColorPalette
+        DarkColors
     }
 
     MaterialTheme(
-        colors = colors,
-        typography = Typography,
-        shapes = Shapes,
+        colorScheme = colors,
         content = content
     )
 }

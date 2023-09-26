@@ -1,36 +1,54 @@
 package com.app.noteit.feature_note.presentation.notes.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.staggeredgrid.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.*
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.app.noteit.R
 import com.app.noteit.feature_note.presentation.notes.NotesEvent
 import com.app.noteit.feature_note.presentation.notes.NotesViewModel
 import com.app.noteit.feature_note.presentation.notes.SearchBarState
 import com.app.noteit.feature_note.presentation.util.Screen
+import com.app.noteit.feature_note.utils.Constants
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
-@OptIn(
-    ExperimentalFoundationApi::class
-)
 @Composable
 fun NotesScreen(
-    navController: NavController, viewModel: NotesViewModel = hiltViewModel()
+    navController: NavController,
+    viewModel: NotesViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.value
     val searchText = state.searchText
     val searchBarState = state.searchBarState
     val notesListStatusState = state.isNotesListEmpty
 
-    val scaffoldState = rememberScaffoldState()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val lazyVerticalStaggeredGridState = rememberLazyStaggeredGridState()
 
@@ -38,77 +56,82 @@ fun NotesScreen(
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is NotesViewModel.UiEvent.ShowSnackbar -> {
-                    val result = scaffoldState.snackbarHostState.showSnackbar(
+                    /*val result = scaffoldState.snackbarHostState.showSnackbar(
                         message = event.message,
                         actionLabel = "Undo",
                     )
 
                     if (result == SnackbarResult.ActionPerformed) {
                         viewModel.onEvent(NotesEvent.RestoreNote)
-                    }
+                    }*/
                 }
             }
         }
     }
 
-    Scaffold(topBar = {
-        MainTopAppBar(searchBarState = searchBarState,
-            searchText = searchText,
-            onTextChanged = { text ->
-                viewModel.onEvent(NotesEvent.UpdateSearchText(text))
-                viewModel.onEvent(NotesEvent.SearchNotes(text))
+    ModalNavigationDrawer(
+        drawerContent = {
+            NavigationDrawerContent(drawerState)
+        },
+        drawerState = drawerState
+    ) {
+        Scaffold(
+            topBar = {
+                MainTopAppBar(
+                    drawerState = drawerState,
+                    searchBarState = searchBarState,
+                    searchText = searchText,
+                    onTextChanged = { text ->
+                        viewModel.onEvent(NotesEvent.UpdateSearchText(text))
+                        viewModel.onEvent(NotesEvent.SearchNotes(text))
 
-                if (text.isEmpty()) {
-                    viewModel.onEvent(NotesEvent.GetAllNotes)
-                }
+                        if (text.isEmpty()) {
+                            viewModel.onEvent(NotesEvent.GetAllNotes)
+                        }
+                    },
+                    onCloseClicked = {
+                        viewModel.onEvent(NotesEvent.UpdateSearchText(""))
+                        viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.CLOSED))
+                        viewModel.onEvent(NotesEvent.GetAllNotes)
+                    },
+                    onSearchClicked = { text ->
+                        viewModel.onEvent(NotesEvent.SearchNotes(text))
+                    },
+                    onSearchTriggered = {
+                        viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.OPENED))
+                    })
             },
-            onCloseClicked = {
-                viewModel.onEvent(NotesEvent.UpdateSearchText(""))
-                viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.CLOSED))
-                viewModel.onEvent(NotesEvent.GetAllNotes)
+            floatingActionButton = {
+                NotesScreenFab(onNoteCreated = {
+                    viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.CLOSED))
+                    navController.navigate(Screen.AddEditNotesScreen.route)
+                })
             },
-            onSearchClicked = { text ->
-                viewModel.onEvent(NotesEvent.SearchNotes(text))
-            },
-            onSearchTriggered = {
-                viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.OPENED))
-            })
-    }, floatingActionButton = {
-        NotesScreenFab(onNoteCreated = {
-            viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.CLOSED))
-            navController.navigate(Screen.AddEditNotesScreen.route)
-        })
-    }, backgroundColor = MaterialTheme.colors.background, scaffoldState = scaffoldState
+            containerColor = MaterialTheme.colorScheme.background,
 
-    ) { innerPadding ->
+            ) { innerPadding ->
 
-        if (state.searchBarState == SearchBarState.OPENED && state.notes.isEmpty()) {
-            EmptyScreen(
-                message = "No matching notes found",
-                animationUrl = "https://assets4.lottiefiles.com/packages/lf20_CXGNxPqYqJ.json"
+            if (state.searchBarState == SearchBarState.OPENED && state.notes.isEmpty()) {
+                EmptyScreen(
+                    message = stringResource(R.string.no_matching_note_found_error_msg),
+                    animationUrl = Constants.NOTE_NOT_FOUND_SCREEN_ANIMATION_URL
+                )
+            } else if (notesListStatusState) {
+                EmptyScreen(
+                    message = stringResource(R.string.empty_notes_screen_error_msg),
+                    animationUrl = Constants.EMPTY_NOTES_SCREEN_ANIMATION_URL
+                )
+            }
+
+            val sortedNotes = state.notes.sortedByDescending { it.isPinned }
+
+            NotesList(
+                lazyVerticalStaggeredGridState = lazyVerticalStaggeredGridState,
+                innerPadding = innerPadding,
+                noteList = sortedNotes,
+                navController = navController
             )
-        } else if (notesListStatusState) {
-            EmptyScreen(
-                message = "All your notes will be shown here",
-                animationUrl = "https://assets6.lottiefiles.com/packages/lf20_Au6z826BEy.json"
-            )
         }
-
-        val pinnedNotesList = state.notes.filter { note ->
-            note.isPinned
-        }
-
-        val unPinnedNotesList = state.notes.filter { note ->
-            !note.isPinned
-        }
-
-        val sortedNotesList = pinnedNotesList.plus(unPinnedNotesList)
-
-        NotesList(lazyVerticalStaggeredGridState = lazyVerticalStaggeredGridState,
-            innerPadding = innerPadding,
-            noteList = sortedNotesList,
-            navController = navController
-        )
     }
 }
 
@@ -117,6 +140,7 @@ fun NotesScreen(
 fun MainTopAppBar(
     searchBarState: SearchBarState,
     searchText: String,
+    drawerState: DrawerState,
     onTextChanged: (String) -> Unit,
     onCloseClicked: () -> Unit,
     onSearchClicked: (String) -> Unit,
@@ -124,7 +148,7 @@ fun MainTopAppBar(
 ) {
     when (searchBarState) {
         SearchBarState.CLOSED -> {
-            NotesScreenTopAppBar(onSearchClicked = { onSearchTriggered() })
+            NotesScreenTopAppBar(onSearchClicked = { onSearchTriggered() }, drawerState = drawerState)
         }
 
         SearchBarState.OPENED -> {
@@ -140,39 +164,58 @@ fun MainTopAppBar(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesScreenTopAppBar(
-    onSearchClicked: () -> Unit
+    onSearchClicked: () -> Unit,
+    drawerState: DrawerState
 ) {
-    TopAppBar(title = {
-        Text(
-            text = "Notes",
-            color = MaterialTheme.colors.onSecondary,
-            style = TextStyle(fontSize = MaterialTheme.typography.h5.fontSize)
-        )
-    }, backgroundColor = MaterialTheme.colors.secondary, actions = {
-        IconButton(onClick = { onSearchClicked() }) {
-            Icon(
-                imageVector = Icons.Filled.Search,
-                contentDescription = "Search Icon",
-                tint = MaterialTheme.colors.onSecondary
+    val scope = rememberCoroutineScope()
+
+    TopAppBar(
+        title = {
+            Text(
+                text = "Notes",
+                color = MaterialTheme.colorScheme.onBackground,
+                style = TextStyle(fontSize = MaterialTheme.typography.titleLarge.fontSize)
             )
+        }, colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background), actions = {
+            IconButton(onClick = { onSearchClicked() }) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search Icon",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = {
+                scope.launch { drawerState.open() }
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
         }
-    })
+    )
 }
 
 @Composable
 fun NotesScreenFab(onNoteCreated: () -> Unit) {
     FloatingActionButton(
         shape = CircleShape,
-        backgroundColor = MaterialTheme.colors.primary,
+        modifier = Modifier.padding(all = 10.dp),
+        containerColor = MaterialTheme.colorScheme.primary,
         onClick = { onNoteCreated() },
     ) {
         Icon(
             imageVector = Icons.Default.Add,
             contentDescription = "Add Note",
-            tint = MaterialTheme.colors.onPrimary,
+            tint = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
+
 

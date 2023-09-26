@@ -1,17 +1,17 @@
 package com.app.noteit.feature_note.presentation.notes.components
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.app.noteit.feature_note.presentation.LottieAnimationItem
 
 @Composable
@@ -31,8 +31,8 @@ fun EmptyScreen(message: String, animationUrl: String) {
 
         Text(
             text = message,
-            fontSize = MaterialTheme.typography.h6.fontSize,
-            color = MaterialTheme.colors.onSecondary
+            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }

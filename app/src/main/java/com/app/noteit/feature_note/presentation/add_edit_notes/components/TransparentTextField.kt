@@ -6,8 +6,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -19,11 +19,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.TextUnit
 import com.app.noteit.ui.theme.BlueColor
 import com.app.noteit.ui.theme.DefaultColor
-import com.app.noteit.ui.theme.NoteTextColor
+
 
 @Composable
 fun TransparentTextField(
@@ -46,7 +45,7 @@ fun TransparentTextField(
         backgroundColor = textSelectionColor.copy(alpha = 0.4f)
     )
 
-    val color = if (noteBackgroundColor == DefaultColor || noteBackgroundColor == BlueColor) MaterialTheme.colors.onSecondary else NoteTextColor
+//    val color = if (noteBackgroundColor == DefaultColor || noteBackgroundColor == BlueColor) MaterialTheme.colorScheme.onSecondary else NoteTextColor
 
     LaunchedEffect(key1 = Unit) {
         if (requestFocus) {
@@ -61,10 +60,10 @@ fun TransparentTextField(
             value = text,
             onValueChange = onValueChange,
             singleLine = singleLine,
-            cursorBrush = SolidColor(color),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
             textStyle = textStyle.copy(
                 fontSize = fontSize,
-                color = color
+                color = MaterialTheme.colorScheme.onBackground
             ), keyboardOptions = keyboardOptions
         ) { innerTextField ->
             Box(
@@ -76,12 +75,12 @@ fun TransparentTextField(
                         text = hint,
                         style = textStyle,
                         fontSize = fontSize,
-                        color = MaterialTheme.colors.onSecondary
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
-                innerTextField()
             }
 
+            innerTextField()
         }
     }
 }

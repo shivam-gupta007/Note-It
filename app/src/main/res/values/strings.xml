@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Note It</string>
+    <string name="no_matching_note_found_error_msg">No matching notes found</string>
+    <string name="empty_notes_screen_error_msg">All your notes will be shown here</string>
 </resources>
