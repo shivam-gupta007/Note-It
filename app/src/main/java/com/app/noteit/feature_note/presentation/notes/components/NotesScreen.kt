@@ -13,6 +13,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -107,7 +108,7 @@ fun NotesScreen(
                     navController.navigate(Screen.AddEditNotesScreen.route)
                 })
             },
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = MaterialTheme.colorScheme.surface,
 
             ) { innerPadding ->
 
@@ -176,15 +177,15 @@ fun NotesScreenTopAppBar(
         title = {
             Text(
                 text = "Notes",
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = TextStyle(fontSize = MaterialTheme.typography.titleLarge.fontSize)
             )
-        }, colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background), actions = {
+        }, colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface), actions = {
             IconButton(onClick = { onSearchClicked() }) {
                 Icon(
                     imageVector = Icons.Filled.Search,
                     contentDescription = "Search Icon",
-                    tint = MaterialTheme.colorScheme.onBackground
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         },
@@ -195,7 +196,7 @@ fun NotesScreenTopAppBar(
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = "Menu",
-                    tint = MaterialTheme.colorScheme.onBackground
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -206,7 +207,7 @@ fun NotesScreenTopAppBar(
 fun NotesScreenFab(onNoteCreated: () -> Unit) {
     FloatingActionButton(
         shape = CircleShape,
-        modifier = Modifier.padding(all = 10.dp),
+        modifier = Modifier.padding(all = 16.dp),
         containerColor = MaterialTheme.colorScheme.primary,
         onClick = { onNoteCreated() },
     ) {

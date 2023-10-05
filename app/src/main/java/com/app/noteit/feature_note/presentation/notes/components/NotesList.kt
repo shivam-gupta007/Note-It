@@ -8,6 +8,8 @@ import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -35,9 +37,7 @@ fun NotesList(
     navController: NavController
 ) {
     val TAG = "NotesList"
-    LazyVerticalStaggeredGrid(
-        columns = StaggeredGridCells.Fixed(count = 2),
-        state = lazyVerticalStaggeredGridState,
+    LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)
@@ -47,7 +47,6 @@ fun NotesList(
                     delayMillis = 100
                 )
             ),
-        flingBehavior = ScrollableDefaults.flingBehavior()
     ) {
         items(
             items = noteList,
@@ -78,10 +77,10 @@ fun NotesList(
                         onClick = {
                             viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.CLOSED))
                             if (note.isProtected) {
-                                Log.i(TAG,"noteId: ${note.id} noteColor: ${note.color}")
-                                navController.navigate(Screen.AuthenticationScreen.route + "?noteId=${note.id}&noteColor=${note.color}")
+                                Log.i(TAG,"noteId: ${note.id} noteColor: ${note.backgroundColor}")
+                                navController.navigate(Screen.AuthenticationScreen.route + "?noteId=${note.id}&noteColor=${note.backgroundColor}")
                             } else {
-                                navController.navigate(Screen.AddEditNotesScreen.route + "?noteId=${note.id}&noteColor=${note.color}")
+                                navController.navigate(Screen.AddEditNotesScreen.route + "?noteId=${note.id}&noteColor=${note.backgroundColor}")
                             }
                         }
                     )
@@ -89,5 +88,6 @@ fun NotesList(
                 background = {}
             )
         }
+
     }
 }

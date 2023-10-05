@@ -22,6 +22,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
 import com.app.noteit.ui.theme.BlueColor
 import com.app.noteit.ui.theme.DefaultColor
+import com.app.noteit.ui.theme.DefaultTextColor
 
 
 @Composable
@@ -60,10 +61,10 @@ fun TransparentTextField(
             value = text,
             onValueChange = onValueChange,
             singleLine = singleLine,
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
+            cursorBrush = SolidColor(DefaultTextColor),
             textStyle = textStyle.copy(
                 fontSize = fontSize,
-                color = MaterialTheme.colorScheme.onBackground
+                color = DefaultTextColor
             ), keyboardOptions = keyboardOptions
         ) { innerTextField ->
             Box(
@@ -75,7 +76,7 @@ fun TransparentTextField(
                         text = hint,
                         style = textStyle,
                         fontSize = fontSize,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = DefaultTextColor
                     )
                 }
             }

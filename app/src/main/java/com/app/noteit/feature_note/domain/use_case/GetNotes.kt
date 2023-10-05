@@ -19,7 +19,7 @@ class GetNotes(
                     when(noteOrder){
                         is NoteOrder.Title -> notes.sortedBy { it.title.lowercase() }
                         is NoteOrder.Date -> notes.sortedBy { it.timestamp }
-                        is NoteOrder.Color -> notes.sortedBy { it.color }
+                        is NoteOrder.Color -> notes.sortedBy { it.backgroundColor }
                     }
                 }
 
@@ -27,7 +27,7 @@ class GetNotes(
                     when(noteOrder){
                         is NoteOrder.Title -> notes.sortedByDescending { it.title.lowercase() }
                         is NoteOrder.Date -> notes.sortedByDescending { it.timestamp }
-                        is NoteOrder.Color -> notes.sortedByDescending { it.color }
+                        is NoteOrder.Color -> notes.sortedByDescending { it.backgroundColor }
                     }
                 }
             }

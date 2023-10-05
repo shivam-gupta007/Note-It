@@ -1,6 +1,7 @@
 package com.app.noteit.feature_note.presentation.add_edit_notes
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
@@ -9,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.app.noteit.feature_note.domain.model.InvalidNoteException
 import com.app.noteit.feature_note.domain.model.Note
 import com.app.noteit.feature_note.domain.use_case.NoteUseCases
+import com.app.noteit.ui.theme.DefaultColor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -35,7 +37,9 @@ class AddEditNotesViewModel @Inject constructor(
                             text = note.content
                         )
 
-                        _noteColor.value = note.color
+                        _noteBackgroundColor.value = note.backgroundColor
+
+                        _noteTextColor.value = note.textColor
 
                         _notePinned.value = _notePinned.value.copy(
                             isPinned = note.isPinned
@@ -78,8 +82,11 @@ class AddEditNotesViewModel @Inject constructor(
 
     val noteProtected: State<NoteTextFieldsState> = _noteProtected
 
-    private val _noteColor = mutableStateOf(Note.noteColors[0].toArgb())
-    val noteColor: State<Int> = _noteColor
+    private val _noteBackgroundColor = mutableIntStateOf(Note.noteColors[0].first.toArgb())
+    val noteBackgroundColor: State<Int> = _noteBackgroundColor
+
+    private val _noteTextColor = mutableIntStateOf(Note.noteColors[0].second.toArgb())
+    val noteTextColor: State<Int> = _noteTextColor
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -99,7 +106,8 @@ class AddEditNotesViewModel @Inject constructor(
             }
 
             is AddEditNoteEvent.ChangeColor -> {
-                _noteColor.value = event.color
+                _noteBackgroundColor.value = event.color
+                _noteTextColor.value = DefaultColor.toArgb()
             }
 
             is AddEditNoteEvent.PinnedNote -> {
@@ -122,7 +130,8 @@ class AddEditNotesViewModel @Inject constructor(
                                 title = noteTitle.value.text,
                                 content = noteContent.value.text,
                                 timestamp = System.currentTimeMillis(),
-                                color = noteColor.value,
+                                backgroundColor = noteBackgroundColor.value,
+                                textColor = noteTextColor.value,
                                 id = currentNoteId,
                                 isPinned = notePinned.value.isPinned,
                                 isProtected = noteProtected.value.isProtected

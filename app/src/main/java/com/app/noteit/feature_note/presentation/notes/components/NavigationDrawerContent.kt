@@ -9,11 +9,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Notes
 import androidx.compose.material.icons.outlined.Password
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material3.DrawerState
@@ -49,10 +51,16 @@ fun NavigationDrawerContent(
             title = "Profile",
             selectedIcon = Icons.Filled.AccountCircle,
             unselectedIcon = Icons.Outlined.AccountCircle
-        ), NavigationItem(
+        ),
+        NavigationItem(
             title = "Reset passcode",
             selectedIcon = Icons.Filled.Password,
             unselectedIcon = Icons.Outlined.Password
+        ),
+        NavigationItem(
+            title = "Share Note It with others",
+            selectedIcon = Icons.Filled.Share,
+            unselectedIcon = Icons.Outlined.Share
         ),
         NavigationItem(
             title = "Sync notes",
@@ -60,10 +68,10 @@ fun NavigationDrawerContent(
             unselectedIcon = Icons.Outlined.Sync
         ),
         NavigationItem(
-            title = "Share Note It with others",
-            selectedIcon = Icons.Filled.Share,
-            unselectedIcon = Icons.Outlined.Share
-        )
+            title = "Settings",
+            selectedIcon = Icons.Filled.Settings,
+            unselectedIcon = Icons.Outlined.Settings
+        ),
     )
 
     var selectedItemIndex by rememberSaveable {

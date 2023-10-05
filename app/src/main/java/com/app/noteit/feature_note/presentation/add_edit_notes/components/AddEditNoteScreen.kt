@@ -74,10 +74,18 @@ fun AddEditNoteScreen(
     val noteProtectedState = viewModel.noteProtected.value
 
     val scaffoldState = rememberScaffoldState()
+    val defaultBackgroundColor = MaterialTheme.colorScheme.background.toArgb()
 
     val noteBackgroundAnimatable = remember {
         Animatable(
-            Color(if (noteColor != -1) noteColor else viewModel.noteColor.value)
+            Color(
+                if (noteColor != -1) {
+                    noteColor
+                } else {
+                    viewModel.onEvent(AddEditNoteEvent.ChangeColor(color = defaultBackgroundColor))
+                    viewModel.noteBackgroundColor.value
+                }
+            )
         )
     }
 
@@ -200,7 +208,7 @@ fun NoteColorPicker(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         items(items = Note.noteColors) { color ->
-            val colorInt = color.toArgb()
+            val noteBackgroundColor = color.first.toArgb()
             Box(
                 modifier = Modifier
                     .size(30.dp)
@@ -209,15 +217,15 @@ fun NoteColorPicker(
                         shape = CircleShape,
                     )
                     .clip(CircleShape)
-                    .background(color)
+                    .background(Color(noteBackgroundColor))
                     .border(
                         width = 2.dp,
-                        color = if (viewModel.noteColor.value == colorInt) Color.White else Color.Transparent,
+                        color = if (viewModel.noteBackgroundColor.value == noteBackgroundColor) Color.White else Color.Transparent,
                         shape = CircleShape
                     )
                     .clickable {
-                        onColorPicked(colorInt)
-                        viewModel.onEvent(AddEditNoteEvent.ChangeColor(color = colorInt))
+                        onColorPicked(noteBackgroundColor)
+                        viewModel.onEvent(AddEditNoteEvent.ChangeColor(color = noteBackgroundColor))
                     },
             )
         }
