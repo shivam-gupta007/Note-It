@@ -6,11 +6,11 @@ import com.app.noteit.feature_note.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 
 class NoteRepositoryImpl(private val noteDao: NoteDao) : NoteRepository {
-    override fun getNotes(): Flow<List<Note>> {
+    override fun fetchNotes(): Flow<List<Note>> {
         return noteDao.getNotes()
     }
 
-    override suspend fun getNoteById(id: Int): Note {
+    override suspend fun fetchNoteById(id: Int): Note {
         return noteDao.getNotesById(id)
     }
 

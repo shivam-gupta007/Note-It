@@ -7,16 +7,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -50,6 +51,7 @@ fun NotesScreen(
     val notesListStatusState = state.isNotesListEmpty
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scaffoldState = rememberScaffoldState()
 
     val lazyVerticalStaggeredGridState = rememberLazyStaggeredGridState()
 
@@ -57,14 +59,14 @@ fun NotesScreen(
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is NotesViewModel.UiEvent.ShowSnackbar -> {
-                    /*val result = scaffoldState.snackbarHostState.showSnackbar(
+                    val result = scaffoldState.snackbarHostState.showSnackbar(
                         message = event.message,
                         actionLabel = "Undo",
                     )
 
                     if (result == SnackbarResult.ActionPerformed) {
                         viewModel.onEvent(NotesEvent.RestoreNote)
-                    }*/
+                    }
                 }
             }
         }
@@ -127,7 +129,6 @@ fun NotesScreen(
             val sortedNotes = state.notes.sortedByDescending { it.isPinned }
 
             NotesList(
-                lazyVerticalStaggeredGridState = lazyVerticalStaggeredGridState,
                 innerPadding = innerPadding,
                 noteList = sortedNotes,
                 navController = navController

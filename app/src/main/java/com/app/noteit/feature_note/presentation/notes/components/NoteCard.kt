@@ -25,40 +25,40 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.app.noteit.R
-import com.app.noteit.ui.theme.BlueColor
-import com.app.noteit.ui.theme.DefaultColor
 import com.app.noteit.feature_note.domain.model.Note
 import com.app.noteit.ui.theme.NoteItTheme
-import com.app.noteit.ui.theme.NoteTextColor
 
 @Composable
-fun NoteItem(
+fun NoteCard(
     modifier: Modifier = Modifier,
     note: Note,
     cornerRadius: Dp = 10.dp,
     onClick: () -> Unit
 ) {
     val defaultBackgroundColor = MaterialTheme.colorScheme.background.toArgb()
-    val borderColor = if (note.backgroundColor == defaultBackgroundColor) MaterialTheme.colorScheme.onBackground else Color.Transparent
+    val borderColor = if (note.backgroundColor == -1) MaterialTheme.colorScheme.onBackground else Color.Transparent
+    val matchedTextColor = Note.noteTextColors[note.backgroundColor]
+    val noteTextColor = if (matchedTextColor != null) Color(matchedTextColor) else MaterialTheme.colorScheme.onBackground
+    val noteBackgroundColor = if (note.backgroundColor != -1) Color(note.backgroundColor) else MaterialTheme.colorScheme.background
+
     Column(
         modifier = modifier
-            .padding(4.dp)
+            .padding(8.dp)
             .clip(RoundedCornerShape(cornerRadius))
             .fillMaxWidth()
             .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(cornerRadius))
-            .background(Color(note.backgroundColor))
+            .background(noteBackgroundColor)
             .clickable { onClick() }
             .padding(16.dp)
     ) {
 
         Text(
             text = note.title,
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            color = Color(note.textColor)
+            color = noteTextColor
         )
 
         Spacer(
@@ -70,18 +70,17 @@ fun NoteItem(
         if (note.isProtected) {
             Icon(
                 imageVector = Icons.Default.Lock,
-                contentDescription = "",
-                tint = MaterialTheme.colorScheme.onPrimary
+                contentDescription = "Lock note",
+                tint = MaterialTheme.colorScheme.onBackground
             )
-        } else {
+        } else if (note.content.isNotEmpty()) {
             Text(
                 modifier = Modifier,
                 text = note.content,
                 style = MaterialTheme.typography.bodyMedium,
-                maxLines = 10,
-                lineHeight = 23.sp,
+                maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                color = Color(note.textColor)
+                color = noteTextColor
             )
         }
     }
@@ -91,17 +90,18 @@ fun NoteItem(
 @Composable
 fun NoteItemPreview() {
     NoteItTheme {
-        NoteItem(
+        NoteCard(
             note = Note(
-                title = "Grocery List", content = """
+                title = "Grocery List",
+                content = """
                 Eggs
                 Milk
                 Bread
                 Rice
                 Bananas
-            """.trimIndent(), timestamp = 100,
+            """.trimIndent(),
+                timestamp = 100,
                 backgroundColor = R.color.teal_200,
-                textColor = R.color.black,
                 isPinned = false,
                 isProtected = false,
             ),
@@ -113,15 +113,16 @@ fun NoteItemPreview() {
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_NO)
 @Composable
 fun NoteItemLightPreview() {
-    NoteItem(
+    NoteCard(
         note = Note(
-            title = "My Title", content = """
+            title = "My Title",
+            content = """
                 Hello, I am android developer
                 working 
-            """.trimIndent(), timestamp = 100, backgroundColor = R.color.teal_200,
+            """.trimIndent(),
+            timestamp = 100, backgroundColor = R.color.teal_200,
             isPinned = true,
             isProtected = true,
-            textColor = R.color.black,
         ),
         onClick = {},
     )

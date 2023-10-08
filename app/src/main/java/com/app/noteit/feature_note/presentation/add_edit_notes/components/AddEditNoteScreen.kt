@@ -68,22 +68,18 @@ fun AddEditNoteScreen(
     viewModel: AddEditNotesViewModel = hiltViewModel()
 ) {
 
-    val titleState = viewModel.noteTitle.value
-    val contentState = viewModel.noteContent.value
-    val notePinnedState = viewModel.notePinned.value
-    val noteProtectedState = viewModel.noteProtected.value
-
+    val note = viewModel.noteState.value
     val scaffoldState = rememberScaffoldState()
     val defaultBackgroundColor = MaterialTheme.colorScheme.background.toArgb()
-
     val noteBackgroundAnimatable = remember {
         Animatable(
             Color(
                 if (noteColor != -1) {
                     noteColor
                 } else {
-                    viewModel.onEvent(AddEditNoteEvent.ChangeColor(color = defaultBackgroundColor))
-                    viewModel.noteBackgroundColor.value
+                    //viewModel.onEvent(AddEditNoteEvent.ChangeColor(color = defaultBackgroundColor))
+                    //note.backgroundColor
+                    defaultBackgroundColor
                 }
             )
         )
@@ -93,7 +89,6 @@ fun AddEditNoteScreen(
         Color(if (noteColor != -1) noteColor else viewModel.noteColor.value)
     }*/
 
-    val isNewNote = remember { noteColor == -1 }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val dataStore = PasscodeDataStore(context = context)
@@ -118,17 +113,17 @@ fun AddEditNoteScreen(
             AddEditScreenTopAppBar(
                 onBackClicked = { navController.navigateUp() },
                 onNotePinned = { isNotePinned ->
-                    viewModel.onEvent(AddEditNoteEvent.PinnedNote(value = isNotePinned))
+                    viewModel.onEvent(AddEditNoteEvent.PinNote(value = isNotePinned))
                 },
                 onNoteProtected = { isNoteProtected ->
                     if (passcode.value.isEmpty()) {
                         navController.navigate(route = Screen.AuthenticationScreen.route)
                     }
-                    viewModel.onEvent(AddEditNoteEvent.ProtectedNote(value = isNoteProtected))
+                    viewModel.onEvent(AddEditNoteEvent.LockNote(value = isNoteProtected))
                 },
                 onNoteSaved = { viewModel.onEvent(AddEditNoteEvent.SaveNote) },
-                isNotePinned = notePinnedState.isPinned,
-                isNoteProtected = noteProtectedState.isProtected
+                isNotePinned = note.isPinned,
+                isNoteProtected = note.isProtected
             )
         },
         scaffoldState = scaffoldState
@@ -141,7 +136,7 @@ fun AddEditNoteScreen(
                 .background(noteBackgroundAnimatable.value)
                 .padding(16.dp)
         ) {
-            NoteColorPicker(
+            /*NoteColorPicker(
                 onColorPicked = { colorInt ->
                     scope.launch {
                         noteBackgroundAnimatable.animateTo(
@@ -154,10 +149,10 @@ fun AddEditNoteScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))*/
 
             TransparentTextField(
-                text = titleState.text,
+                text = note.title,
                 hint = "Title",
                 onValueChange = {
                     viewModel.onEvent(AddEditNoteEvent.EnteredTitle(it))
@@ -165,7 +160,6 @@ fun AddEditNoteScreen(
                 singleLine = true,
                 textStyle = MaterialTheme.typography.titleLarge,
                 fontSize = 25.sp,
-                requestFocus = isNewNote,
                 textSelectionColor = if (noteBackgroundAnimatable.value == BlueColor) BrownColor else BlueColor,
                 noteBackgroundColor = noteBackgroundAnimatable.value,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -176,8 +170,8 @@ fun AddEditNoteScreen(
             TransparentTextField(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .clickable { openUrlInBrowser(contentState.text) },
-                text = contentState.text,
+                    .clickable { openUrlInBrowser(note.content) },
+                text = note.content,
                 hint = "Text",
                 onValueChange = {
                     viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
@@ -207,8 +201,8 @@ fun NoteColorPicker(
             .padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        items(items = Note.noteColors) { color ->
-            val noteBackgroundColor = color.first.toArgb()
+        items(items = Note.noteColors) { noteBackgroundColor ->
+
             Box(
                 modifier = Modifier
                     .size(30.dp)
@@ -220,12 +214,12 @@ fun NoteColorPicker(
                     .background(Color(noteBackgroundColor))
                     .border(
                         width = 2.dp,
-                        color = if (viewModel.noteBackgroundColor.value == noteBackgroundColor) Color.White else Color.Transparent,
+                        color = if (viewModel.noteState.value.backgroundColor == noteBackgroundColor) Color.White else Color.Transparent,
                         shape = CircleShape
                     )
                     .clickable {
                         onColorPicked(noteBackgroundColor)
-                        viewModel.onEvent(AddEditNoteEvent.ChangeColor(color = noteBackgroundColor))
+                        viewModel.onEvent(AddEditNoteEvent.ChangeNoteColor(color = noteBackgroundColor))
                     },
             )
         }

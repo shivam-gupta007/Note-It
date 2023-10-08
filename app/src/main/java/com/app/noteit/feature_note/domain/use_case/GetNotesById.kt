@@ -7,6 +7,6 @@ class GetNotesById(
     private val repository: NoteRepository
 ) {
     suspend operator fun invoke(id: Int): Note?{
-        return repository.getNoteById(id)
+        return repository.fetchNoteById(id)
     }
 }

@@ -52,7 +52,7 @@ fun NavigationDrawerContent(
             selectedIcon = Icons.Filled.AccountCircle,
             unselectedIcon = Icons.Outlined.AccountCircle
         ),
-        NavigationItem(
+        /*NavigationItem(
             title = "Reset passcode",
             selectedIcon = Icons.Filled.Password,
             unselectedIcon = Icons.Outlined.Password
@@ -66,7 +66,7 @@ fun NavigationDrawerContent(
             title = "Sync notes",
             selectedIcon = Icons.Filled.Sync,
             unselectedIcon = Icons.Outlined.Sync
-        ),
+        ),*/
         NavigationItem(
             title = "Settings",
             selectedIcon = Icons.Filled.Settings,
