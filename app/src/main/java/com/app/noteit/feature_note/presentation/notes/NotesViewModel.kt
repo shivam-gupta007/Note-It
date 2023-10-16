@@ -50,7 +50,9 @@ class NotesViewModel @Inject constructor(
                 viewModelScope.launch {
                     notesUseCases.deleteNote(event.note)
                     recentlyDeletedNote = event.note
-                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "${event.note.title} deleted"))
+                    val noteTitle = event.note.title.take(40)
+                    val message = if(noteTitle.length >= 40) "$noteTitle..." else noteTitle
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "$message deleted"))
                 }
             }
             is NotesEvent.RestoreNote -> {

@@ -28,7 +28,8 @@ data class Note(
             RedOrange.toArgb(),
             Violet.toArgb(),
             BabyBlue.toArgb(),
-            RedPink.toArgb()
+            RedPink.toArgb(),
+            RedPink.toArgb(),
         )
 
         val noteTextColors = mapOf(

@@ -1,13 +1,12 @@
 package com.app.noteit.feature_note.presentation.notes.components
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,17 +16,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
-import androidx.compose.material.SnackbarResult
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -51,15 +54,13 @@ fun NotesScreen(
     val notesListStatusState = state.isNotesListEmpty
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scaffoldState = rememberScaffoldState()
-
-    val lazyVerticalStaggeredGridState = rememberLazyStaggeredGridState()
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is NotesViewModel.UiEvent.ShowSnackbar -> {
-                    val result = scaffoldState.snackbarHostState.showSnackbar(
+                    val result = snackBarHostState.showSnackbar(
                         message = event.message,
                         actionLabel = "Undo",
                     )
@@ -79,6 +80,9 @@ fun NotesScreen(
         drawerState = drawerState
     ) {
         Scaffold(
+            snackbarHost = {
+                SnackbarHost(snackBarHostState)
+            },
             topBar = {
                 MainTopAppBar(
                     drawerState = drawerState,
@@ -92,13 +96,13 @@ fun NotesScreen(
                             viewModel.onEvent(NotesEvent.GetAllNotes)
                         }
                     },
-                    onCloseClicked = {
+                    onClearClicked = {
+                        viewModel.onEvent(NotesEvent.UpdateSearchText(""))
+                    },
+                    onBackClicked = {
                         viewModel.onEvent(NotesEvent.UpdateSearchText(""))
                         viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.CLOSED))
                         viewModel.onEvent(NotesEvent.GetAllNotes)
-                    },
-                    onSearchClicked = { text ->
-                        viewModel.onEvent(NotesEvent.SearchNotes(text))
                     },
                     onSearchTriggered = {
                         viewModel.onEvent(NotesEvent.UpdateSearchBarState(SearchBarState.OPENED))
@@ -144,8 +148,8 @@ fun MainTopAppBar(
     searchText: String,
     drawerState: DrawerState,
     onTextChanged: (String) -> Unit,
-    onCloseClicked: () -> Unit,
-    onSearchClicked: (String) -> Unit,
+    onClearClicked: () -> Unit,
+    onBackClicked: () -> Unit,
     onSearchTriggered: () -> Unit
 ) {
     when (searchBarState) {
@@ -157,8 +161,8 @@ fun MainTopAppBar(
             SearchAppBar(
                 text = searchText,
                 onTextChanged = onTextChanged,
-                onCloseClicked = onCloseClicked,
-                onSearchClicked = onSearchClicked
+                onClearClicked = onClearClicked,
+                onBackClicked = onBackClicked
             )
         }
 
@@ -174,14 +178,16 @@ fun NotesScreenTopAppBar(
 ) {
     val scope = rememberCoroutineScope()
 
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
             Text(
                 text = "Notes",
-                color = MaterialTheme.colorScheme.onSurface,
-                style = TextStyle(fontSize = MaterialTheme.typography.titleLarge.fontSize)
+                style = MaterialTheme.typography.headlineSmall
             )
-        }, colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface), actions = {
+        }, colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground
+        ), actions = {
             IconButton(onClick = { onSearchClicked() }) {
                 Icon(
                     imageVector = Icons.Filled.Search,

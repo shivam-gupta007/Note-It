@@ -7,13 +7,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.IconButton
 import androidx.compose.material.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,8 +31,8 @@ fun SearchAppBar(
     modifier: Modifier = Modifier,
     text: String,
     onTextChanged: (String) -> Unit,
-    onCloseClicked: () -> Unit,
-    onSearchClicked: (String) -> Unit
+    onClearClicked: () -> Unit,
+    onBackClicked: () -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -67,10 +67,10 @@ fun SearchAppBar(
                 leadingIcon = {
                     IconButton(
                         modifier = Modifier.alpha(0.4F),
-                        onClick = { onSearchClicked(text) }) {
+                        onClick = { onBackClicked() }) {
                         Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search Icon",
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back icon",
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
@@ -78,16 +78,12 @@ fun SearchAppBar(
                 trailingIcon = {
                     IconButton(
                         onClick = {
-                            if (text.isNotEmpty()) {
-                                onTextChanged("")
-                            } else {
-                                onCloseClicked()
-                            }
+                            onClearClicked()
                         }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Close Icon",
+                            contentDescription = "Clear Icon",
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
@@ -96,10 +92,9 @@ fun SearchAppBar(
                     imeAction = ImeAction.Search
                 ),
                 keyboardActions = KeyboardActions(
-                    onSearch = { onSearchClicked(text) }
+                    onSearch = { /*Handle this case*/ }
                 ),
                 colors = TextFieldDefaults.colors(
-
                     cursorColor = MaterialTheme.colorScheme.onBackground
                 )
             )

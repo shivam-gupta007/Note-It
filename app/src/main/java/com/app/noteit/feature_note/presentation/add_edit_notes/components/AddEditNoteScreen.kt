@@ -1,56 +1,37 @@
 package com.app.noteit.feature_note.presentation.add_edit_notes.components
 
 import androidx.compose.animation.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.outlined.LockOpen
-import androidx.compose.material.icons.outlined.PushPin
-import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.app.noteit.feature_note.data.data_source.preferences.PasscodeDataStore
-import com.app.noteit.feature_note.domain.model.Note
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNoteEvent
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNotesViewModel
 import com.app.noteit.feature_note.presentation.util.Screen
@@ -58,7 +39,6 @@ import com.app.noteit.feature_note.presentation.util.UrlsIdentifier
 import com.app.noteit.ui.theme.BlueColor
 import com.app.noteit.ui.theme.BrownColor
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -89,6 +69,8 @@ fun AddEditNoteScreen(
         Color(if (noteColor != -1) noteColor else viewModel.noteColor.value)
     }*/
 
+
+    var showColorPicker by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val dataStore = PasscodeDataStore(context = context)
@@ -102,7 +84,7 @@ fun AddEditNoteScreen(
                 }
 
                 is AddEditNotesViewModel.UiEvent.SaveNote -> {
-                    navController.navigateUp()
+                    navController.popBackStack()
                 }
             }
         }
@@ -111,7 +93,7 @@ fun AddEditNoteScreen(
     Scaffold(
         topBar = {
             AddEditScreenTopAppBar(
-                onBackClicked = { navController.navigateUp() },
+                onBackClicked = { navController.popBackStack() },
                 onNotePinned = { isNotePinned ->
                     viewModel.onEvent(AddEditNoteEvent.PinNote(value = isNotePinned))
                 },
@@ -122,8 +104,11 @@ fun AddEditNoteScreen(
                     viewModel.onEvent(AddEditNoteEvent.LockNote(value = isNoteProtected))
                 },
                 onNoteSaved = { viewModel.onEvent(AddEditNoteEvent.SaveNote) },
-                isNotePinned = note.isPinned,
-                isNoteProtected = note.isProtected
+                onColorPickerClicked = {
+                    showColorPicker = !showColorPicker
+                },
+                onShareNoteClicked = {},
+                note = note
             )
         },
         scaffoldState = scaffoldState
@@ -136,20 +121,14 @@ fun AddEditNoteScreen(
                 .background(noteBackgroundAnimatable.value)
                 .padding(16.dp)
         ) {
-            /*NoteColorPicker(
-                onColorPicked = { colorInt ->
-                    scope.launch {
-                        noteBackgroundAnimatable.animateTo(
-                            targetValue = Color(colorInt),
-                            animationSpec = tween(
-                                durationMillis = 500
-                            )
-                        )
+            if (showColorPicker) {
+                NoteColorPicker(
+                    onColorPicked = { colorInt ->
                     }
-                }
-            )
+                )
+            }
 
-            Spacer(modifier = Modifier.height(10.dp))*/
+            Spacer(modifier = Modifier.height(10.dp))
 
             TransparentTextField(
                 text = note.title,
@@ -158,11 +137,11 @@ fun AddEditNoteScreen(
                     viewModel.onEvent(AddEditNoteEvent.EnteredTitle(it))
                 },
                 singleLine = true,
-                textStyle = MaterialTheme.typography.titleLarge,
+                textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 fontSize = 25.sp,
                 textSelectionColor = if (noteBackgroundAnimatable.value == BlueColor) BrownColor else BlueColor,
                 noteBackgroundColor = noteBackgroundAnimatable.value,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -190,94 +169,5 @@ fun openUrlInBrowser(text: String) {
     val urls = UrlsIdentifier.URL_REGEX_PATTERN.toRegex().findAll(text).map { it.value }.toList()
 }
 
-@Composable
-fun NoteColorPicker(
-    viewModel: AddEditNotesViewModel = hiltViewModel(),
-    onColorPicked: (Int) -> Unit
-) {
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        items(items = Note.noteColors) { noteBackgroundColor ->
 
-            Box(
-                modifier = Modifier
-                    .size(30.dp)
-                    .shadow(
-                        elevation = 10.dp,
-                        shape = CircleShape,
-                    )
-                    .clip(CircleShape)
-                    .background(Color(noteBackgroundColor))
-                    .border(
-                        width = 2.dp,
-                        color = if (viewModel.noteState.value.backgroundColor == noteBackgroundColor) Color.White else Color.Transparent,
-                        shape = CircleShape
-                    )
-                    .clickable {
-                        onColorPicked(noteBackgroundColor)
-                        viewModel.onEvent(AddEditNoteEvent.ChangeNoteColor(color = noteBackgroundColor))
-                    },
-            )
-        }
-    }
-}
-
-
-@Composable
-fun AddEditScreenTopAppBar(
-    onBackClicked: () -> Unit,
-    onNotePinned: (Boolean) -> Unit,
-    onNoteProtected: (Boolean) -> Unit,
-    onNoteSaved: () -> Unit,
-    isNotePinned: Boolean,
-    isNoteProtected: Boolean
-) {
-    TopAppBar(
-        title = { Text("") },
-        navigationIcon = {
-            IconButton(
-                onClick = { onBackClicked() }) {
-                Icon(
-                    Icons.Filled.ArrowBack,
-                    contentDescription = "Back arrow",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-        },
-        backgroundColor = MaterialTheme.colorScheme.background,
-        actions = {
-            IconButton(
-                onClick = { onNoteProtected(!isNoteProtected) }
-            ) {
-                Icon(
-                    imageVector = if (isNoteProtected) Icons.Filled.Lock else Icons.Outlined.LockOpen,
-                    contentDescription = "Protect note",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            IconButton(
-                onClick = { onNotePinned(!isNotePinned) }
-            ) {
-                Icon(
-                    imageVector = if (isNotePinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
-                    contentDescription = "Pin note",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            IconButton(
-                onClick = { onNoteSaved() }
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.TaskAlt,
-                    contentDescription = "Save note",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-        }
-    )
-}
 
