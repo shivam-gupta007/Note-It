@@ -6,7 +6,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.app.noteit.ui.theme.BabyBlue
 import com.app.noteit.ui.theme.BlueColor
-import com.app.noteit.ui.theme.DefaultColor
 import com.app.noteit.ui.theme.DefaultTextColor
 import com.app.noteit.ui.theme.RedOrange
 import com.app.noteit.ui.theme.RedPink
@@ -23,7 +22,7 @@ data class Note(
     @PrimaryKey val id: Int? = null
 ) {
     companion object {
-        val noteColors = listOf(
+        val noteBackgroundColors = listOf(
             BlueColor.toArgb(),
             RedOrange.toArgb(),
             Violet.toArgb(),
@@ -32,7 +31,7 @@ data class Note(
             RedPink.toArgb(),
         )
 
-        val noteTextColors = mapOf(
+        val noteOnBackgroundColor = mapOf(
             BlueColor.toArgb() to Color.White.toArgb(),
             RedOrange.toArgb() to DefaultTextColor.toArgb(),
             Violet.toArgb() to DefaultTextColor.toArgb(),

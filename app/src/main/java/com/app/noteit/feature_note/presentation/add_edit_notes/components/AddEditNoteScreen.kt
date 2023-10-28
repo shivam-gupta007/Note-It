@@ -1,6 +1,8 @@
 package com.app.noteit.feature_note.presentation.add_edit_notes.components
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -34,11 +36,14 @@ import androidx.navigation.NavHostController
 import com.app.noteit.feature_note.data.data_source.preferences.PasscodeDataStore
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNoteEvent
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNotesViewModel
+import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNoteState
 import com.app.noteit.feature_note.presentation.util.Screen
 import com.app.noteit.feature_note.presentation.util.UrlsIdentifier
+import com.app.noteit.feature_note.utils.shareNote
 import com.app.noteit.ui.theme.BlueColor
 import com.app.noteit.ui.theme.BrownColor
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -47,34 +52,19 @@ fun AddEditNoteScreen(
     noteColor: Int,
     viewModel: AddEditNotesViewModel = hiltViewModel()
 ) {
-
-    val note = viewModel.noteState.value
+    val note = viewModel.addEditNoteState.value
     val scaffoldState = rememberScaffoldState()
     val defaultBackgroundColor = MaterialTheme.colorScheme.background.toArgb()
-    val noteBackgroundAnimatable = remember {
-        Animatable(
-            Color(
-                if (noteColor != -1) {
-                    noteColor
-                } else {
-                    //viewModel.onEvent(AddEditNoteEvent.ChangeColor(color = defaultBackgroundColor))
-                    //note.backgroundColor
-                    defaultBackgroundColor
-                }
-            )
-        )
+    val selectedNoteBackgroundColor = Color(if (noteColor != -1) noteColor else defaultBackgroundColor)
+    val animateNoteBackground = remember {
+        Animatable(selectedNoteBackgroundColor)
     }
 
-    /*val noteBackgroundAnimatable = remember {
-        Color(if (noteColor != -1) noteColor else viewModel.noteColor.value)
-    }*/
-
-
     var showColorPicker by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val dataStore = PasscodeDataStore(context = context)
-    val passcode = dataStore.getPin.collectAsState(initial = "")
+    val passcode = dataStore.getPin.collectAsState(initial = "").value
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -86,29 +76,41 @@ fun AddEditNoteScreen(
                 is AddEditNotesViewModel.UiEvent.SaveNote -> {
                     navController.popBackStack()
                 }
+
+                is AddEditNotesViewModel.UiEvent.SaveNoteFailure ->{
+                    navController.popBackStack()
+                }
             }
         }
+    }
+
+    BackHandler {
+        viewModel.onEvent(AddEditNoteEvent.SaveNote)
     }
 
     Scaffold(
         topBar = {
             AddEditScreenTopAppBar(
-                onBackClicked = { navController.popBackStack() },
-                onNotePinned = { isNotePinned ->
-                    viewModel.onEvent(AddEditNoteEvent.PinNote(value = isNotePinned))
+                backgroundColor = animateNoteBackground.value.toArgb(),
+                onBackClicked = {
+                    viewModel.onEvent(AddEditNoteEvent.SaveNote)
                 },
-                onNoteProtected = { isNoteProtected ->
-                    if (passcode.value.isEmpty()) {
+                pinNote = { isPinned ->
+                    viewModel.onEvent(AddEditNoteEvent.PinNote(value = isPinned))
+                },
+                lockNote = { isLocked ->
+                    if (passcode.isEmpty()) {
                         navController.navigate(route = Screen.AuthenticationScreen.route)
+                    } else {
+                        viewModel.onEvent(AddEditNoteEvent.LockNote(value = isLocked))
                     }
-                    viewModel.onEvent(AddEditNoteEvent.LockNote(value = isNoteProtected))
                 },
-                onNoteSaved = { viewModel.onEvent(AddEditNoteEvent.SaveNote) },
-                onColorPickerClicked = {
-                    showColorPicker = !showColorPicker
+                onColorPickerClicked = { showColorPicker = !showColorPicker },
+                shareNote = {
+                    val noteContent = prepareNoteContentForSharing(note)
+                    context.shareNote(noteContent)
                 },
-                onShareNoteClicked = {},
-                note = note
+                addEditNoteState = note
             )
         },
         scaffoldState = scaffoldState
@@ -118,12 +120,21 @@ fun AddEditNoteScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(noteBackgroundAnimatable.value)
+                .background(animateNoteBackground.value)
                 .padding(16.dp)
         ) {
             if (showColorPicker) {
                 NoteColorPicker(
-                    onColorPicked = { colorInt ->
+                    noteColor = selectedNoteBackgroundColor.toArgb(),
+                    onColorPicked = { pickedColor ->
+                        coroutineScope.launch {
+                            animateNoteBackground.animateTo(
+                                targetValue = Color(if(pickedColor != -1) pickedColor else defaultBackgroundColor),
+                                animationSpec = tween(durationMillis = 100),
+                            )
+                        }
+
+                        viewModel.onEvent(AddEditNoteEvent.ChangeNoteColor(color = pickedColor))
                     }
                 )
             }
@@ -139,8 +150,8 @@ fun AddEditNoteScreen(
                 singleLine = true,
                 textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 fontSize = 25.sp,
-                textSelectionColor = if (noteBackgroundAnimatable.value == BlueColor) BrownColor else BlueColor,
-                noteBackgroundColor = noteBackgroundAnimatable.value,
+                textSelectionColor = if (animateNoteBackground.value == BlueColor) BrownColor else BlueColor,
+                noteBackgroundColor = animateNoteBackground.value,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             )
 
@@ -158,8 +169,8 @@ fun AddEditNoteScreen(
                 singleLine = false,
                 textStyle = MaterialTheme.typography.bodyMedium,
                 fontSize = 16.sp,
-                textSelectionColor = if (noteBackgroundAnimatable.value == BlueColor) BrownColor else BlueColor,
-                noteBackgroundColor = noteBackgroundAnimatable.value
+                textSelectionColor = if (animateNoteBackground.value == BlueColor) BrownColor else BlueColor,
+                noteBackgroundColor = animateNoteBackground.value
             )
         }
     }
@@ -167,6 +178,10 @@ fun AddEditNoteScreen(
 
 fun openUrlInBrowser(text: String) {
     val urls = UrlsIdentifier.URL_REGEX_PATTERN.toRegex().findAll(text).map { it.value }.toList()
+}
+
+private fun prepareNoteContentForSharing(note: AddEditNoteState): String {
+    return "${note.title}\n\n${note.content}"
 }
 
 

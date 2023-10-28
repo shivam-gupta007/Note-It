@@ -1,6 +1,5 @@
 package com.app.noteit.feature_note.presentation.add_edit_notes.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
@@ -11,19 +10,14 @@ import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
 import com.app.noteit.feature_note.domain.model.Note
-import com.app.noteit.ui.theme.DefaultColor
 
 
 @Composable
@@ -44,7 +38,7 @@ fun TransparentTextField(
         backgroundColor = textSelectionColor.copy(alpha = 0.4f)
     )
 
-    val noteTextColor = Color(Note.noteTextColors[noteBackgroundColor.toArgb()] ?: MaterialTheme.colorScheme.onBackground.toArgb())
+    val noteTextColor = Color(Note.noteOnBackgroundColor[noteBackgroundColor.toArgb()] ?: MaterialTheme.colorScheme.onBackground.toArgb())
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         BasicTextField(

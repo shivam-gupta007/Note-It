@@ -36,11 +36,12 @@ fun NoteCard(
     cornerRadius: Dp = 10.dp,
     onClick: () -> Unit
 ) {
-    val defaultBackgroundColor = MaterialTheme.colorScheme.background.toArgb()
-    val borderColor = if (note.backgroundColor == -1) MaterialTheme.colorScheme.onBackground else Color.Transparent
-    val matchedTextColor = Note.noteTextColors[note.backgroundColor]
-    val noteTextColor = if (matchedTextColor != null) Color(matchedTextColor) else MaterialTheme.colorScheme.onBackground
-    val noteBackgroundColor = if (note.backgroundColor != -1) Color(note.backgroundColor) else MaterialTheme.colorScheme.background
+    val defaultBackgroundColor = MaterialTheme.colorScheme.background
+    val defaultOnBackgroundColor = MaterialTheme.colorScheme.onBackground
+    val borderColor = if (note.backgroundColor == -1) defaultOnBackgroundColor else Color.Transparent
+    val matchedTextColor = Note.noteOnBackgroundColor[note.backgroundColor]
+    val noteTextColor = if (matchedTextColor != null) Color(matchedTextColor) else defaultOnBackgroundColor
+    val noteBackgroundColor = if (note.backgroundColor != -1) Color(note.backgroundColor) else defaultBackgroundColor
 
     Column(
         modifier = modifier
@@ -71,7 +72,7 @@ fun NoteCard(
             Icon(
                 imageVector = Icons.Default.Lock,
                 contentDescription = "Lock note",
-                tint = MaterialTheme.colorScheme.onBackground
+                tint = noteTextColor
             )
         } else if (note.content.isNotEmpty()) {
             Text(

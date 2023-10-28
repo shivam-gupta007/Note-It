@@ -24,15 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.noteit.feature_note.domain.model.EditNoteSheetActionType
 
-@Composable
-fun AddEditNoteBottomSheet(
-    onColorSelected: (Int) -> Unit,
-    onItemClick: (EditNoteSheetActionType) -> Unit
-) {
-    NoteColorPicker {
-
-    }
-}
 
 @Composable
 fun BottomSheetItem(

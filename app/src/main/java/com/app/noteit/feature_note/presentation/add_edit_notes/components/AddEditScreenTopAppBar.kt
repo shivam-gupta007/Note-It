@@ -14,18 +14,24 @@ import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import com.app.noteit.feature_note.presentation.add_edit_notes.NoteState
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import com.app.noteit.feature_note.domain.model.Note
+import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNoteState
 
 @Composable
 fun AddEditScreenTopAppBar(
+    backgroundColor: Int,
     onBackClicked: () -> Unit,
-    onNotePinned: (Boolean) -> Unit,
-    onNoteProtected: (Boolean) -> Unit,
-    onNoteSaved: () -> Unit,
+    pinNote: (Boolean) -> Unit,
+    lockNote: (Boolean) -> Unit,
     onColorPickerClicked: () -> Unit,
-    onShareNoteClicked: () -> Unit,
-    note: NoteState
+    shareNote: () -> Unit,
+    addEditNoteState: AddEditNoteState
 ) {
+
+    val iconTint = Color(Note.noteOnBackgroundColor[backgroundColor] ?: MaterialTheme.colorScheme.onBackground.toArgb())
+    val showShareNoteIcon = addEditNoteState.title.isNotEmpty()
 
     TopAppBar(
         title = { Text("") },
@@ -35,28 +41,28 @@ fun AddEditScreenTopAppBar(
                 Icon(
                     Icons.Filled.ArrowBack,
                     contentDescription = "Back arrow",
-                    tint = MaterialTheme.colorScheme.onBackground
+                    tint = iconTint
                 )
             }
         },
-        backgroundColor = MaterialTheme.colorScheme.background,
+        backgroundColor = Color(backgroundColor),
         actions = {
             IconButton(
-                onClick = { onNoteProtected(!note.isProtected) }
+                onClick = { lockNote(!addEditNoteState.isLocked) }
             ) {
                 Icon(
-                    imageVector = if (note.isProtected) Icons.Filled.Lock else Icons.Outlined.LockOpen,
-                    contentDescription = "Protect note",
-                    tint = MaterialTheme.colorScheme.onBackground
+                    imageVector = if (addEditNoteState.isLocked) Icons.Filled.Lock else Icons.Outlined.LockOpen,
+                    contentDescription = "Locak note",
+                    tint = iconTint
                 )
             }
             IconButton(
-                onClick = { onNotePinned(!note.isPinned) }
+                onClick = { pinNote(!addEditNoteState.isPinned) }
             ) {
                 Icon(
-                    imageVector = if (note.isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+                    imageVector = if (addEditNoteState.isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
                     contentDescription = "Pin note",
-                    tint = MaterialTheme.colorScheme.onBackground
+                    tint = iconTint
                 )
             }
             IconButton(
@@ -65,20 +71,21 @@ fun AddEditScreenTopAppBar(
                 Icon(
                     imageVector = Icons.Outlined.Palette,
                     contentDescription = "Change note color",
-                    tint = MaterialTheme.colorScheme.onBackground
+                    tint = iconTint
                 )
             }
 
-            IconButton(
-                onClick = { onShareNoteClicked() }
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Share,
-                    contentDescription = "Share note",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
+            if(showShareNoteIcon) {
+                IconButton(
+                    onClick = { shareNote() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Share,
+                        contentDescription = "Share note",
+                        tint = iconTint
+                    )
+                }
             }
-
         }
     )
 }
