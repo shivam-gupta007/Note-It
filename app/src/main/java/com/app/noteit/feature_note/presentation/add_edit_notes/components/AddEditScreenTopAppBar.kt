@@ -30,7 +30,7 @@ fun AddEditScreenTopAppBar(
     addEditNoteState: AddEditNoteState
 ) {
 
-    val iconTint = Color(Note.noteOnBackgroundColor[backgroundColor] ?: MaterialTheme.colorScheme.onBackground.toArgb())
+    val iconTint = Color(Note.noteTextColorsOnDisplay[backgroundColor] ?: MaterialTheme.colorScheme.onBackground.toArgb())
     val showShareNoteIcon = addEditNoteState.title.isNotEmpty()
 
     TopAppBar(

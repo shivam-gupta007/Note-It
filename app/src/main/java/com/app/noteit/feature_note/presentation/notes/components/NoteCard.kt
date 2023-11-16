@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,10 +37,10 @@ fun NoteCard(
 ) {
     val defaultBackgroundColor = MaterialTheme.colorScheme.background
     val defaultOnBackgroundColor = MaterialTheme.colorScheme.onBackground
-    val borderColor = if (note.backgroundColor == -1) defaultOnBackgroundColor else Color.Transparent
-    val matchedTextColor = Note.noteOnBackgroundColor[note.backgroundColor]
+    val borderColor = if (note.color == -1) defaultOnBackgroundColor else Color.Transparent
+    val matchedTextColor = Note.noteTextColorsOnDisplay[note.color]
     val noteTextColor = if (matchedTextColor != null) Color(matchedTextColor) else defaultOnBackgroundColor
-    val noteBackgroundColor = if (note.backgroundColor != -1) Color(note.backgroundColor) else defaultBackgroundColor
+    val noteBackgroundColor = if (note.color != -1) Color(note.color) else defaultBackgroundColor
 
     Column(
         modifier = modifier
@@ -101,8 +100,9 @@ fun NoteItemPreview() {
                 Rice
                 Bananas
             """.trimIndent(),
+                id = null,
                 timestamp = 100,
-                backgroundColor = R.color.teal_200,
+                color = R.color.teal_200,
                 isPinned = false,
                 isProtected = false,
             ),
@@ -121,8 +121,9 @@ fun NoteItemLightPreview() {
                 Hello, I am android developer
                 working 
             """.trimIndent(),
-            timestamp = 100, backgroundColor = R.color.teal_200,
+            timestamp = 100, color = R.color.teal_200,
             isPinned = true,
+            id = null,
             isProtected = true,
         ),
         onClick = {},

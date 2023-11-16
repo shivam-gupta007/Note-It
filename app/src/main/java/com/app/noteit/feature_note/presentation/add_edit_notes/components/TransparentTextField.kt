@@ -38,7 +38,7 @@ fun TransparentTextField(
         backgroundColor = textSelectionColor.copy(alpha = 0.4f)
     )
 
-    val noteTextColor = Color(Note.noteOnBackgroundColor[noteBackgroundColor.toArgb()] ?: MaterialTheme.colorScheme.onBackground.toArgb())
+    val noteTextColor = Color(Note.noteTextColorsOnDisplay[noteBackgroundColor.toArgb()] ?: MaterialTheme.colorScheme.onBackground.toArgb())
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         BasicTextField(

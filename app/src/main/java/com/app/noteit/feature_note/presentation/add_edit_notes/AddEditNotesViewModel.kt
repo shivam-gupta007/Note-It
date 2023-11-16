@@ -5,9 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.app.noteit.feature_note.data.model.toNoteEntity
 import com.app.noteit.feature_note.domain.model.InvalidNoteException
 import com.app.noteit.feature_note.domain.model.Note
-import com.app.noteit.feature_note.domain.use_case.NoteUseCases
+import com.app.noteit.feature_note.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddEditNotesViewModel @Inject constructor(
-    private val noteUseCases: NoteUseCases,
+    private val repository: NoteRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -25,7 +26,7 @@ class AddEditNotesViewModel @Inject constructor(
         savedStateHandle.get<Int>("noteId")?.let { noteId ->
             if (noteId != -1) {
                 viewModelScope.launch {
-                    noteUseCases.getNotesById(noteId)?.also { note ->
+                    repository.fetchNoteById(noteId)?.also { note ->
                         currentNoteId = note.id
                         _addEditNoteState.value = _addEditNoteState.value.copy(
                             title = note.title,
@@ -73,16 +74,16 @@ class AddEditNotesViewModel @Inject constructor(
             is AddEditNoteEvent.SaveNote -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
-                        noteUseCases.insertNote(
+                        repository.insertNote(
                             Note(
                                 title = addEditNoteState.value.title.trim(),
                                 content = addEditNoteState.value.content.trim(),
                                 timestamp = System.currentTimeMillis(),
-                                backgroundColor = addEditNoteState.value.backgroundColor,
+                                color = addEditNoteState.value.backgroundColor,
                                 id = currentNoteId,
                                 isPinned = addEditNoteState.value.isPinned,
                                 isProtected = addEditNoteState.value.isLocked
-                            )
+                            ).toNoteEntity()
                         )
 
                         _eventFlow.emit(UiEvent.SaveNote)

@@ -2,11 +2,10 @@ package com.app.noteit.feature_note.data.data_source.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.app.noteit.feature_note.data.data_source.local.NoteDao
-import com.app.noteit.feature_note.domain.model.Note
+import com.app.noteit.feature_note.data.model.NoteEntity
 
 @Database(
-    entities = [Note::class],
+    entities = [NoteEntity::class],
     version = 1,
     exportSchema = false
 )

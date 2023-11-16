@@ -1,12 +1,10 @@
 package com.app.noteit.feature_note.presentation.notes.components
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.IconButton
-import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -28,7 +26,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SearchAppBar(
-    modifier: Modifier = Modifier,
     text: String,
     onTextChanged: (String) -> Unit,
     onClearClicked: () -> Unit,
@@ -40,24 +37,17 @@ fun SearchAppBar(
         focusRequester.requestFocus()
     }
 
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(height = 60.dp),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column {
             TextField(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
+                    .height(height = 60.dp)
                     .focusRequester(focusRequester),
                 value = text,
                 onValueChange = { onTextChanged(it) },
                 placeholder = {
                     Text(
-                        modifier = Modifier.alpha(0.4F),
-                        text = "Search your notes",
-                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.alpha(0.6F),
+                        text = "Search your notes"
                     )
                 },
                 textStyle = TextStyle(
@@ -66,12 +56,10 @@ fun SearchAppBar(
                 singleLine = true,
                 leadingIcon = {
                     IconButton(
-                        modifier = Modifier.alpha(0.4F),
                         onClick = { onBackClicked() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back icon",
-                            tint = MaterialTheme.colorScheme.onBackground
+                            contentDescription = "Back icon"
                         )
                     }
                 },
@@ -83,8 +71,7 @@ fun SearchAppBar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Clear Icon",
-                            tint = MaterialTheme.colorScheme.onBackground
+                            contentDescription = "Clear Icon"
                         )
                     }
                 },
@@ -95,9 +82,8 @@ fun SearchAppBar(
                     onSearch = { /*Handle this case*/ }
                 ),
                 colors = TextFieldDefaults.colors(
-                    cursorColor = MaterialTheme.colorScheme.onBackground
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
                 )
             )
-        }
     }
-}

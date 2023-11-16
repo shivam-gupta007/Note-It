@@ -42,7 +42,7 @@ fun NoteColorPicker(
     val defaultNoteBackground = MaterialTheme.colorScheme.background.toArgb()
 
     val noteBackgroundColors = mutableListOf(defaultNoteBackground)
-    noteBackgroundColors.addAll(Note.noteBackgroundColors)
+    noteBackgroundColors.addAll(Note.noteDisplayColors)
 
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
