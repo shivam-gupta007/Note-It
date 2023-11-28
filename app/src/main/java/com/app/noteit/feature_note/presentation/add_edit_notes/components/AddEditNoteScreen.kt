@@ -12,9 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Scaffold
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,24 +55,25 @@ fun AddEditNoteScreen(
     viewModel: AddEditNotesViewModel = hiltViewModel()
 ) {
     val note = viewModel.addEditNoteState.value
-    val scaffoldState = rememberScaffoldState()
     val defaultBackgroundColor = MaterialTheme.colorScheme.background.toArgb()
     val selectedNoteBackgroundColor = Color(if (noteColor != -1) noteColor else defaultBackgroundColor)
-    val animateNoteBackground = remember {
-        Animatable(selectedNoteBackgroundColor)
-    }
-
     var showColorPicker by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
+
     val context = LocalContext.current
     val dataStore = PasscodeDataStore(context = context)
     val passcode = dataStore.getPin.collectAsState(initial = "").value
 
+    val coroutineScope = rememberCoroutineScope()
+    val animateNoteBackground = remember {
+        Animatable(selectedNoteBackgroundColor)
+    }
+    val snackBarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                is AddEditNotesViewModel.UiEvent.ShowSnackbar -> {
-                    scaffoldState.snackbarHostState.showSnackbar(message = event.message)
+                is AddEditNotesViewModel.UiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(message = event.message)
                 }
 
                 is AddEditNotesViewModel.UiEvent.SaveNote -> {
@@ -89,6 +92,7 @@ fun AddEditNoteScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = {
             AddEditScreenTopAppBar(
                 backgroundColor = animateNoteBackground.value.toArgb(),
@@ -113,15 +117,18 @@ fun AddEditNoteScreen(
                 addEditNoteState = note
             )
         },
-        scaffoldState = scaffoldState
-    ) {
-        println(it)
+    ) { it ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(animateNoteBackground.value)
-                .padding(16.dp)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = it.calculateTopPadding(),
+                    bottom = it.calculateBottomPadding()
+                )
         ) {
             if (showColorPicker) {
                 NoteColorPicker(

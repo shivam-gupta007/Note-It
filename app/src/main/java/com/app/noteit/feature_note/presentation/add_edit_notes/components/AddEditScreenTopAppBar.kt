@@ -1,9 +1,5 @@
 package com.app.noteit.feature_note.presentation.add_edit_notes.components
 
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Lock
@@ -12,13 +8,20 @@ import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.app.noteit.feature_note.domain.model.Note
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNoteState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditScreenTopAppBar(
     backgroundColor: Int,
@@ -45,14 +48,14 @@ fun AddEditScreenTopAppBar(
                 )
             }
         },
-        backgroundColor = Color(backgroundColor),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(backgroundColor)),
         actions = {
             IconButton(
                 onClick = { lockNote(!addEditNoteState.isLocked) }
             ) {
                 Icon(
                     imageVector = if (addEditNoteState.isLocked) Icons.Filled.Lock else Icons.Outlined.LockOpen,
-                    contentDescription = "Locak note",
+                    contentDescription = "Lock note",
                     tint = iconTint
                 )
             }

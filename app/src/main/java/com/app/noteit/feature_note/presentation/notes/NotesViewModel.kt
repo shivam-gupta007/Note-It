@@ -51,10 +51,10 @@ class NotesViewModel @Inject constructor(
 
             is NotesEvent.RestoreNote -> {
                 viewModelScope.launch(Dispatchers.IO) {
-                    val noteEntity = recentlyDeletedNote?.toNoteEntity()
-                    recentlyDeletedNote = null
-                    noteEntity?.let {
-                        repository.insertNote(note = it)
+                    recentlyDeletedNote?.let { deletedNote ->
+                        val note = deletedNote.toNoteEntity()
+                        repository.insertNote(note = note)
+                        recentlyDeletedNote = null
                     }
                 }
             }

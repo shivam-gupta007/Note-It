@@ -74,22 +74,28 @@ class AddEditNotesViewModel @Inject constructor(
             is AddEditNoteEvent.SaveNote -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
+                        val note = addEditNoteState.value
+
+                        if(note.title.isEmpty() && note.content.isEmpty()){
+                            throw InvalidNoteException(message = "Empty note discarded.")
+                        }
+
                         repository.insertNote(
                             Note(
-                                title = addEditNoteState.value.title.trim(),
-                                content = addEditNoteState.value.content.trim(),
+                                title = note.title.trim(),
+                                content = note.content.trim(),
                                 timestamp = System.currentTimeMillis(),
-                                color = addEditNoteState.value.backgroundColor,
+                                color = note.backgroundColor,
                                 id = currentNoteId,
-                                isPinned = addEditNoteState.value.isPinned,
-                                isProtected = addEditNoteState.value.isLocked
+                                isPinned = note.isPinned,
+                                isProtected = note.isLocked
                             ).toNoteEntity()
                         )
 
                         _eventFlow.emit(UiEvent.SaveNote)
                     } catch (e: InvalidNoteException) {
                         _eventFlow.emit(UiEvent.SaveNoteFailure)
-                        UiEvent.ShowSnackbar(
+                        UiEvent.ShowSnackBar(
                             message = e.message ?: "Couldn't save note"
                         )
                     }
@@ -100,7 +106,7 @@ class AddEditNotesViewModel @Inject constructor(
     }
 
     sealed class UiEvent {
-        data class ShowSnackbar(val message: String) : UiEvent()
+        data class ShowSnackBar(val message: String) : UiEvent()
         object SaveNote : UiEvent()
         object SaveNoteFailure: UiEvent()
     }
