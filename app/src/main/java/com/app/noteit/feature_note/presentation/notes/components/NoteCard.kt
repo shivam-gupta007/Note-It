@@ -102,7 +102,7 @@ fun NoteItemPreview() {
             """.trimIndent(),
                 id = null,
                 timestamp = 100,
-                color = R.color.teal_200,
+                color = R.color.purple_200,
                 isPinned = false,
                 isProtected = false,
             ),

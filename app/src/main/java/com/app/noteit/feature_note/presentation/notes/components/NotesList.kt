@@ -39,12 +39,7 @@ fun NotesList(
         modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)
-            .padding(all = 8.dp)
-            .animateContentSize(
-                animationSpec = snap(
-                    delayMillis = 100
-                )
-            ),
+            .padding(all = 8.dp),
     ) {
         items(
             items = noteList,
@@ -68,7 +63,7 @@ fun NotesList(
                 dismissContent = {
                     NoteCard(
                         modifier = Modifier
-                            .animateItemPlacement(animationSpec = tween(durationMillis = 600)),
+                            .animateItemPlacement(tween(durationMillis = 250)),
                         note = note,
                         onClick = {
                             val route = if (note.isProtected) {

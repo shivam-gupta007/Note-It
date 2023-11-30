@@ -2,7 +2,13 @@ package com.app.noteit.feature_note.presentation.add_edit_notes.components
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Animatable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -48,6 +54,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AddEditNoteScreen(
     navController: NavHostController,
@@ -130,8 +137,12 @@ fun AddEditNoteScreen(
                     bottom = it.calculateBottomPadding()
                 )
         ) {
-            if (showColorPicker) {
+            AnimatedVisibility (showColorPicker) {
                 NoteColorPicker(
+                    modifier = Modifier.animateEnterExit(
+                        enter = slideInVertically(),
+                        exit = slideOutVertically()
+                    ),
                     noteColor = selectedNoteBackgroundColor.toArgb(),
                     onColorPicked = { pickedColor ->
                         coroutineScope.launch {

@@ -1,5 +1,9 @@
 package com.app.noteit.feature_note.presentation.add_edit_notes.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,8 +33,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.app.noteit.feature_note.domain.model.Note
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NoteColorPicker(
+    modifier: Modifier = Modifier,
     itemSize: Dp = 35.dp,
     shape : Shape = CircleShape,
     noteColor: Int  = -1,
@@ -45,7 +51,7 @@ fun NoteColorPicker(
     noteBackgroundColors.addAll(Note.noteDisplayColors)
 
     LazyRow(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         items(items = noteBackgroundColors) { itemColor ->
@@ -62,12 +68,15 @@ fun NoteColorPicker(
                     }.border(width = 2.dp, color = selectedColor, shape = shape)
                     .padding(all = 4.dp),
             ) {
-                Icon(
-                    modifier = Modifier.size(itemSize),
-                    imageVector = Icons.Outlined.Check,
-                    contentDescription = "Checked",
-                    tint = selectedColor
-                )
+                val isCheckedIconVisible = selectedColor != Color.Transparent
+                AnimatedVisibility(isCheckedIconVisible) {
+                    Icon(
+                        modifier = Modifier.size(itemSize),
+                        imageVector = Icons.Outlined.Check,
+                        contentDescription = "Checked",
+                        tint = selectedColor
+                    )
+                }
             }
         }
     }

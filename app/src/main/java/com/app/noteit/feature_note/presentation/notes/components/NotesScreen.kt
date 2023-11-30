@@ -1,5 +1,15 @@
 package com.app.noteit.feature_note.presentation.notes.components
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -46,6 +56,7 @@ import com.app.noteit.feature_note.utils.Constants
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NotesScreen(
     navController: NavController,
@@ -55,11 +66,16 @@ fun NotesScreen(
     var searchText by remember { mutableStateOf("") }
     var searchBarState by remember { mutableStateOf<SearchBarState>(SearchBarState.CLOSED) }
 
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val snackBarHostState = remember { SnackbarHostState() }
 
     fun clearSearchText(){
         searchText = ""
+    }
+
+    BackHandler {
+        if(searchBarState == SearchBarState.OPENED){
+            searchBarState = SearchBarState.CLOSED
+        }
     }
 
     LaunchedEffect(key1 = true) {
@@ -80,44 +96,44 @@ fun NotesScreen(
         }
     }
 
-    ModalNavigationDrawer(
-        drawerContent = { NavigationDrawerContent(drawerState) },
-        drawerState = drawerState
-    ) {
+
         Scaffold(
             snackbarHost = { SnackbarHost(snackBarHostState) },
             topBar = {
-                when (searchBarState) {
-                    SearchBarState.CLOSED -> {
-                        NotesScreenTopAppBar(
-                            onSearchTriggered = { searchBarState = SearchBarState.OPENED },
-                            drawerState = drawerState
-                        )
-                    }
 
-                    SearchBarState.OPENED -> {
-                        SearchAppBar(
-                            text = searchText,
-                            onTextChanged = { text ->
-                                searchText = text
-                                viewModel.onEvent(NotesEvent.SearchNotes(text))
+                AnimatedVisibility(
+                    visible = searchBarState == SearchBarState.OPENED,
+                    enter = expandHorizontally(),
+                    exit = shrinkHorizontally()
+                ){
+                    SearchAppBar(
+                        text = searchText,
+                        onTextChanged = { text ->
+                            searchText = text
+                            viewModel.onEvent(NotesEvent.SearchNotes(text))
 
-                                if (text.isEmpty()) {
-                                    viewModel.onEvent(NotesEvent.GetAllNotes)
-                                }
-                            },
-                            onClearClicked = {
-                                clearSearchText()
-                            },
-                            onBackClicked = {
-                                clearSearchText()
-                                searchBarState = SearchBarState.CLOSED
+                            if (text.isEmpty()) {
                                 viewModel.onEvent(NotesEvent.GetAllNotes)
                             }
-                        )
-                    }
+                        },
+                        onClearClicked = {
+                            clearSearchText()
+                        },
+                        onBackClicked = {
+                            clearSearchText()
+                            searchBarState = SearchBarState.CLOSED
+                            viewModel.onEvent(NotesEvent.GetAllNotes)
+                        }
+                    )
 
                 }
+
+                if(searchBarState == SearchBarState.CLOSED){
+                    NotesScreenTopAppBar(
+                        onSearchTriggered = { searchBarState = SearchBarState.OPENED }
+                    )
+                }
+
             },
             floatingActionButton = {
                 NotesScreenFab(onAddNote = {
@@ -149,16 +165,13 @@ fun NotesScreen(
                 navController = navController
             )
         }
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesScreenTopAppBar(
-    onSearchTriggered: () -> Unit,
-    drawerState: DrawerState
+    onSearchTriggered: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
 
     CenterAlignedTopAppBar(
         title = {
@@ -174,17 +187,6 @@ fun NotesScreenTopAppBar(
                 Icon(
                     imageVector = Icons.Filled.Search,
                     contentDescription = "Search Icon",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = {
-                scope.launch { drawerState.open() }
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }

@@ -26,10 +26,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SearchAppBar(
-    text: String,
-    onTextChanged: (String) -> Unit,
-    onClearClicked: () -> Unit,
-    onBackClicked: () -> Unit
+     text: String, onTextChanged: (String) -> Unit, onClearClicked: () -> Unit, onBackClicked: () -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -37,53 +34,30 @@ fun SearchAppBar(
         focusRequester.requestFocus()
     }
 
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height = 60.dp)
-                    .focusRequester(focusRequester),
-                value = text,
-                onValueChange = { onTextChanged(it) },
-                placeholder = {
-                    Text(
-                        modifier = Modifier.alpha(0.6F),
-                        text = "Search your notes"
-                    )
-                },
-                textStyle = TextStyle(
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                ),
-                singleLine = true,
-                leadingIcon = {
-                    IconButton(
-                        onClick = { onBackClicked() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back icon"
-                        )
-                    }
-                },
-                trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            onClearClicked()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Clear Icon"
-                        )
-                    }
-                },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Search
-                ),
-                keyboardActions = KeyboardActions(
-                    onSearch = { /*Handle this case*/ }
-                ),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                )
+    TextField(modifier = Modifier.fillMaxWidth().height(height = 60.dp).focusRequester(focusRequester), value = text, onValueChange = { onTextChanged(it) }, placeholder = {
+        Text(
+            modifier = Modifier.alpha(0.6F), text = "Search your notes"
+        )
+    }, textStyle = TextStyle(
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize
+    ), singleLine = true, leadingIcon = {
+        IconButton(onClick = { onBackClicked() }) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack, contentDescription = "Back icon"
             )
-    }
+        }
+    }, trailingIcon = {
+        IconButton(onClick = {
+            onClearClicked()
+        }) {
+            Icon(
+                imageVector = Icons.Default.Close, contentDescription = "Clear Icon"
+            )
+        }
+    }, keyboardOptions = KeyboardOptions(
+        imeAction = ImeAction.Search
+    ), keyboardActions = KeyboardActions(onSearch = { /*Handle this case*/ }), colors = TextFieldDefaults.colors(
+        focusedContainerColor = MaterialTheme.colorScheme.background,
+        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+    ))
+}
