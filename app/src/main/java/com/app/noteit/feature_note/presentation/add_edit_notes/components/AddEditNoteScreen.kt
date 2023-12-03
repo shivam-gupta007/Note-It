@@ -5,9 +5,7 @@ import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,16 +34,13 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.app.noteit.feature_note.data.data_source.preferences.PasscodeDataStore
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNoteEvent
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNotesViewModel
 import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNoteState
-import com.app.noteit.feature_note.presentation.util.Screen
 import com.app.noteit.feature_note.presentation.util.UrlsIdentifier
 import com.app.noteit.feature_note.utils.shareNote
 import com.app.noteit.ui.theme.BlueColor
@@ -57,10 +52,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AddEditNoteScreen(
-    navController: NavHostController,
     noteColor: Int,
-    viewModel: AddEditNotesViewModel = hiltViewModel()
+    onLockNoteClicked : () -> Unit,
+    onNoteSaved: () -> Unit,
+    onNoteUnsaved: () -> Unit
 ) {
+    val viewModel: AddEditNotesViewModel = hiltViewModel()
     val note = viewModel.addEditNoteState.value
     val defaultBackgroundColor = MaterialTheme.colorScheme.background.toArgb()
     val selectedNoteBackgroundColor = Color(if (noteColor != -1) noteColor else defaultBackgroundColor)
@@ -84,11 +81,11 @@ fun AddEditNoteScreen(
                 }
 
                 is AddEditNotesViewModel.UiEvent.SaveNote -> {
-                    navController.popBackStack()
+                    onNoteSaved()
                 }
 
                 is AddEditNotesViewModel.UiEvent.SaveNoteFailure ->{
-                    navController.popBackStack()
+                    onNoteUnsaved()
                 }
             }
         }
@@ -102,7 +99,7 @@ fun AddEditNoteScreen(
         snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = {
             AddEditScreenTopAppBar(
-                backgroundColor = animateNoteBackground.value.toArgb(),
+                backgroundColor = animateNoteBackground.value,
                 onBackClicked = {
                     viewModel.onEvent(AddEditNoteEvent.SaveNote)
                 },
@@ -111,7 +108,7 @@ fun AddEditNoteScreen(
                 },
                 lockNote = { isLocked ->
                     if (passcode.isEmpty()) {
-                        navController.navigate(route = Screen.AuthenticationScreen.route)
+                        onLockNoteClicked()
                     } else {
                         viewModel.onEvent(AddEditNoteEvent.LockNote(value = isLocked))
                     }
@@ -124,7 +121,7 @@ fun AddEditNoteScreen(
                 addEditNoteState = note
             )
         },
-    ) { it ->
+    ) { innerPadding ->
 
         Column(
             modifier = Modifier
@@ -133,8 +130,8 @@ fun AddEditNoteScreen(
                 .padding(
                     start = 16.dp,
                     end = 16.dp,
-                    top = it.calculateTopPadding(),
-                    bottom = it.calculateBottomPadding()
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
                 )
         ) {
             AnimatedVisibility (showColorPicker) {
@@ -143,7 +140,7 @@ fun AddEditNoteScreen(
                         enter = slideInVertically(),
                         exit = slideOutVertically()
                     ),
-                    noteColor = selectedNoteBackgroundColor.toArgb(),
+                    noteColor = animateNoteBackground.value.toArgb(),
                     onColorPicked = { pickedColor ->
                         coroutineScope.launch {
                             animateNoteBackground.animateTo(

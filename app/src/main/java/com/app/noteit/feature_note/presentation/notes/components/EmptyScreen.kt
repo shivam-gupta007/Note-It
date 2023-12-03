@@ -11,11 +11,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.app.noteit.feature_note.presentation.LottieAnimationItem
 
 @Composable
-fun EmptyScreen(message: String, animationUrl: String) {
+fun EmptyScreen(stringRes: Int, animationUrl: String) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -30,7 +31,7 @@ fun EmptyScreen(message: String, animationUrl: String) {
         Spacer(modifier = Modifier.height(height = 5.dp))
 
         Text(
-            text = message,
+            text = stringResource(stringRes),
             fontSize = MaterialTheme.typography.titleLarge.fontSize,
             color = MaterialTheme.colorScheme.onBackground
         )

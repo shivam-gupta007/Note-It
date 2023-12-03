@@ -24,7 +24,7 @@ import com.app.noteit.feature_note.presentation.add_edit_notes.AddEditNoteState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditScreenTopAppBar(
-    backgroundColor: Int,
+    backgroundColor: Color,
     onBackClicked: () -> Unit,
     pinNote: (Boolean) -> Unit,
     lockNote: (Boolean) -> Unit,
@@ -33,7 +33,7 @@ fun AddEditScreenTopAppBar(
     addEditNoteState: AddEditNoteState
 ) {
 
-    val iconTint = Color(Note.noteTextColorsOnDisplay[backgroundColor] ?: MaterialTheme.colorScheme.onBackground.toArgb())
+    val iconTint = Color(Note.noteTextColorsOnDisplay[backgroundColor.toArgb()] ?: MaterialTheme.colorScheme.onBackground.toArgb())
     val showShareNoteIcon = addEditNoteState.title.isNotEmpty()
 
     TopAppBar(
@@ -48,7 +48,7 @@ fun AddEditScreenTopAppBar(
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(backgroundColor)),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = backgroundColor, scrolledContainerColor = backgroundColor),
         actions = {
             IconButton(
                 onClick = { lockNote(!addEditNoteState.isLocked) }

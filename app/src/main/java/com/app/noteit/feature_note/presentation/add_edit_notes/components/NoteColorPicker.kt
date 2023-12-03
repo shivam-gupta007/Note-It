@@ -33,13 +33,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.app.noteit.feature_note.domain.model.Note
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NoteColorPicker(
     modifier: Modifier = Modifier,
     itemSize: Dp = 35.dp,
     shape : Shape = CircleShape,
-    noteColor: Int  = -1,
+    noteColor: Int,
     onColorPicked: (Int) -> Unit
 ) {
     val borderColorSelection = MaterialTheme.colorScheme.onBackground.toArgb()
@@ -68,16 +67,13 @@ fun NoteColorPicker(
                     }.border(width = 2.dp, color = selectedColor, shape = shape)
                     .padding(all = 4.dp),
             ) {
-                val isCheckedIconVisible = selectedColor != Color.Transparent
-                AnimatedVisibility(isCheckedIconVisible) {
                     Icon(
                         modifier = Modifier.size(itemSize),
                         imageVector = Icons.Outlined.Check,
                         contentDescription = "Checked",
                         tint = selectedColor
                     )
-                }
-            }
+                            }
         }
     }
 }

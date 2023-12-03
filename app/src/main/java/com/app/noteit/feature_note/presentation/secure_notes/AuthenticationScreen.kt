@@ -34,7 +34,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.app.noteit.feature_note.data.data_source.preferences.PasscodeDataStore
 import com.app.noteit.feature_note.presentation.LottieAnimationItem
 import com.app.noteit.feature_note.presentation.util.Screen
@@ -43,9 +42,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AuthenticationScreen(
-    navController: NavHostController,
-    noteColor: Int,
-    noteId: Int
+    onPasscodeSaved: () -> Unit,
+    onPasscodeConfirmed :() -> Unit
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -160,14 +158,12 @@ fun AuthenticationScreen(
                     coroutineScope.launch {
                         dataStore.setPin(pin = enteredPasscode)
                     }
-                    navController.navigateUp()
+                    onPasscodeSaved.invoke()
                 } else {
                     Toast.makeText(
                         context,
                         if (passcode.value == enteredPasscode) {
-                            navController.navigate(Screen.AddEditNotesScreen.route + "?noteId=${noteId}&noteColor=${noteColor}") {
-                                popUpTo(Screen.NotesScreen.route)
-                            }
+                            onPasscodeConfirmed()
                             "Passcode confirmed"
                         } else {
                             "Invalid Passcode"
