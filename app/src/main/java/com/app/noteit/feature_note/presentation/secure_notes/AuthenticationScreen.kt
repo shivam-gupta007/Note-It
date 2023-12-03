@@ -1,17 +1,31 @@
 package com.app.noteit.feature_note.presentation.secure_notes
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -20,19 +34,17 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.app.noteit.feature_note.data.data_source.preferences.PasscodeDataStore
 import com.app.noteit.feature_note.presentation.LottieAnimationItem
 import com.app.noteit.feature_note.presentation.util.Screen
+import com.app.noteit.feature_note.utils.Constants
 import kotlinx.coroutines.launch
 
 @Composable
 fun AuthenticationScreen(
-    navController: NavHostController,
-    noteColor: Int,
-    noteId: Int
+    onPasscodeSaved: () -> Unit,
+    onPasscodeConfirmed :() -> Unit
 ) {
-    val TAG = "AuthenticationScreen"
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val dataStore = PasscodeDataStore(context = context)
@@ -52,27 +64,28 @@ fun AuthenticationScreen(
         focusRequester1.requestFocus()
     }
 
-    Log.i(TAG, "noteId: $noteId noteColor: $noteColor")
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colors.background)
+            .background(color = MaterialTheme.colorScheme.background)
             .padding(all = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
         LottieAnimationItem(
             modifier = Modifier.size(size = 250.dp),
-            animationUrl = "https://assets10.lottiefiles.com/packages/lf20_bmfghkq7.json",
+            animationUrl = Constants.LOCK_ANIMATION_URL,
             iterateForever = false
         )
+
 
         Spacer(modifier = Modifier.height(height = 10.dp))
 
         Text(
             text = if (passcode.value.isEmpty()) "Enter your passcode" else "Verify your passcode",
-            fontSize = MaterialTheme.typography.h6.fontSize
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleLarge
         )
 
         Spacer(modifier = Modifier.height(height = 15.dp))
@@ -100,7 +113,7 @@ fun AuthenticationScreen(
                     passcodeDigit2 = it
                     if (it.isNotBlank()) {
                         focusRequester3.requestFocus()
-                    } else{
+                    } else {
                         focusRequester1.requestFocus()
                     }
                 }
@@ -125,7 +138,7 @@ fun AuthenticationScreen(
                 value = passcodeDigit4,
                 onValueChange = {
                     passcodeDigit4 = it
-                    if(it.isBlank()){
+                    if (it.isBlank()) {
                         focusRequester3.requestFocus()
                     }
                 }
@@ -145,14 +158,12 @@ fun AuthenticationScreen(
                     coroutineScope.launch {
                         dataStore.setPin(pin = enteredPasscode)
                     }
-                    navController.navigateUp()
+                    onPasscodeSaved.invoke()
                 } else {
                     Toast.makeText(
                         context,
                         if (passcode.value == enteredPasscode) {
-                            navController.navigate(Screen.AddEditNotesScreen.route + "?noteId=${noteId}&noteColor=${noteColor}") {
-                                popUpTo(Screen.NotesScreen.route)
-                            }
+                            onPasscodeConfirmed()
                             "Passcode confirmed"
                         } else {
                             "Invalid Passcode"
@@ -165,6 +176,7 @@ fun AuthenticationScreen(
             Text(text = if (passcode.value.isEmpty()) "SAVE" else "CONFIRM")
         }
     }
+
 }
 
 @Composable
@@ -187,7 +199,7 @@ fun PasscodeTextField(
         maxLines = 1,
         textStyle = TextStyle(
             textAlign = TextAlign.Center,
-            fontSize = MaterialTheme.typography.h6.fontSize
+            fontSize = MaterialTheme.typography.bodyLarge.fontSize
         ),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     )

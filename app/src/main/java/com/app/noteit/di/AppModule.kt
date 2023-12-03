@@ -5,7 +5,6 @@ import androidx.room.Room
 import com.app.noteit.feature_note.data.data_source.local.NoteDatabase
 import com.app.noteit.feature_note.data.repository.NoteRepositoryImpl
 import com.app.noteit.feature_note.domain.repository.NoteRepository
-import com.app.noteit.feature_note.domain.use_case.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,16 +29,5 @@ object AppModule {
     @Singleton
     fun provideNoteRepository(db: NoteDatabase): NoteRepository {
         return NoteRepositoryImpl(db.noteDao)
-    }
-
-    @Provides
-    @Singleton
-    fun provideNoteUseCases(repository: NoteRepository): NoteUseCases{
-        return NoteUseCases(
-            getNotes = GetNotes(repository),
-            insertNote = InsertNote(repository),
-            deleteNote = DeleteNote(repository),
-            getNotesById = GetNotesById(repository)
-        )
     }
 }

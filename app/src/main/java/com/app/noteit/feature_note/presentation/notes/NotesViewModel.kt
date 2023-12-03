@@ -1,17 +1,19 @@
 package com.app.noteit.feature_note.presentation.notes
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.app.noteit.feature_note.data.model.toNoteEntity
+import com.app.noteit.feature_note.data.model.toNoteList
 import com.app.noteit.feature_note.domain.model.Note
-import com.app.noteit.feature_note.domain.use_case.NoteUseCases
-import com.app.noteit.feature_note.domain.util.NoteOrder
-import com.app.noteit.feature_note.domain.util.OrderType
+import com.app.noteit.feature_note.domain.model.getDeletedNoteMessage
+import com.app.noteit.feature_note.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -19,107 +21,72 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val notesUseCases: NoteUseCases
+    private val repository : NoteRepository
 ) : ViewModel() {
 
     private var recentlyDeletedNote: Note? = null
 
-    private val _state = mutableStateOf(NotesState())
-    val state: State<NotesState> = _state
-
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    private val _notesFlow = MutableStateFlow<List<Note>>(emptyList())
+    val notesFlow = _notesFlow.asStateFlow()
 
     private var getNotesJob: Job? = null
 
     init {
-        getNotes(NoteOrder.Date(OrderType.Descending)) //Getting notes by default
+        getNotes()
     }
 
     fun onEvent(event: NotesEvent) {
         when (event) {
-            is NotesEvent.Order -> {
-                if (state.value.noteOrder::class == event.noteOrder::class &&
-                    state.value.noteOrder.orderType == event.noteOrder.orderType
-                ) {
-                    return
-                }
-                getNotes(noteOrder = event.noteOrder)
-            }
             is NotesEvent.DeleteNote -> {
-                viewModelScope.launch {
-                    notesUseCases.deleteNote(event.note)
+                viewModelScope.launch(Dispatchers.IO) {
+                    val noteEntity = event.note.toNoteEntity()
                     recentlyDeletedNote = event.note
-                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "${event.note.title} deleted"))
+                    repository.deleteNote(noteEntity)
+                    _eventFlow.emit(UiEvent.ShowSnackBar(message = event.note.getDeletedNoteMessage()))
                 }
             }
+
             is NotesEvent.RestoreNote -> {
-                viewModelScope.launch {
-                    notesUseCases.insertNote(recentlyDeletedNote ?: return@launch)
-                    recentlyDeletedNote = null
+                viewModelScope.launch(Dispatchers.IO) {
+                    recentlyDeletedNote?.let { deletedNote ->
+                        val note = deletedNote.toNoteEntity()
+                        repository.insertNote(note = note)
+                        recentlyDeletedNote = null
+                    }
                 }
-            }
-            is NotesEvent.ToggleOrderSection -> {
-                _state.value = _state.value.copy(
-                    isOrderSectionVisible = !state.value.isOrderSectionVisible
-                )
             }
 
             is NotesEvent.GetAllNotes -> {
-                getNotes(noteOrder = NoteOrder.Date(OrderType.Descending))
+                getNotes()
             }
 
             is NotesEvent.SearchNotes -> {
-                searchNote(
-                    searchText = event.searchText,
-                    noteOrder = NoteOrder.Date(OrderType.Descending)
-                )
+                searchNote(event.searchText)
             }
-
-            is NotesEvent.UpdateSearchBarState -> {
-                _state.value = _state.value.copy(
-                    searchBarState = event.state
-                )
-            }
-
-            is NotesEvent.UpdateSearchText -> {
-                _state.value = _state.value.copy(
-                    searchText = event.value
-                )
-            }
-
         }
     }
 
-    private fun getNotes(noteOrder: NoteOrder) {
+    private fun getNotes() {
         getNotesJob?.cancel()
-        getNotesJob = notesUseCases.getNotes(noteOrder)
+        getNotesJob = repository.fetchNotes()
             .onEach { notes ->
-                _state.value = state.value.copy(
-                    notes = notes,
-                    noteOrder = noteOrder
-                )
-
-                _state.value = _state.value.copy(
-                    isNotesListEmpty = notes.isEmpty()
-                )
-            }
-            .launchIn(viewModelScope)
+                _notesFlow.emit(notes.toNoteList())
+            }.launchIn(viewModelScope)
     }
 
-    private fun searchNote(searchText: String, noteOrder: NoteOrder) {
-        val searchedNoteList = state.value.notes.filter { note ->
-            note.title.contains(searchText,true) || note.content.contains(searchText,true)
-        }
-
-        _state.value = state.value.copy(
-            notes = searchedNoteList,
-            noteOrder = noteOrder
-        )
+    private fun searchNote(searchText: String) {
+        getNotesJob?.cancel()
+        getNotesJob = repository.findNotesByQuery(searchText)
+            .onEach { notes ->
+                _notesFlow.emit(notes.toNoteList())
+            }.launchIn(viewModelScope)
     }
 
     sealed class UiEvent {
-        data class ShowSnackbar(val message: String) : UiEvent()
+        data class ShowSnackBar(val message: String) : UiEvent()
     }
 }
 

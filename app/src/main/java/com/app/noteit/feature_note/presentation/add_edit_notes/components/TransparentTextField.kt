@@ -10,19 +10,14 @@ import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
-import com.app.noteit.ui.theme.BlueColor
-import com.app.noteit.ui.theme.DefaultColor
-import com.app.noteit.ui.theme.DefaultTextColor
+import com.app.noteit.feature_note.domain.model.Note
 
 
 @Composable
@@ -34,37 +29,28 @@ fun TransparentTextField(
     textStyle: TextStyle = TextStyle(),
     singleLine: Boolean = false,
     fontSize: TextUnit,
-    requestFocus: Boolean = false,
     textSelectionColor: Color,
     noteBackgroundColor: Color,
     keyboardOptions: KeyboardOptions = KeyboardOptions()
 ) {
-    val focusRequester = remember { FocusRequester() }
-
     val customTextSelectionColors = TextSelectionColors(
         handleColor = textSelectionColor,
         backgroundColor = textSelectionColor.copy(alpha = 0.4f)
     )
 
-//    val color = if (noteBackgroundColor == DefaultColor || noteBackgroundColor == BlueColor) MaterialTheme.colorScheme.onSecondary else NoteTextColor
+    val noteTextColor = Color(Note.noteTextColorsOnDisplay[noteBackgroundColor.toArgb()] ?: MaterialTheme.colorScheme.onBackground.toArgb())
 
-    LaunchedEffect(key1 = Unit) {
-        if (requestFocus) {
-            focusRequester.requestFocus()
-        }
-    }
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         BasicTextField(
             modifier = modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
+                .fillMaxWidth(),
             value = text,
             onValueChange = onValueChange,
             singleLine = singleLine,
-            cursorBrush = SolidColor(DefaultTextColor),
+            cursorBrush = SolidColor(noteTextColor),
             textStyle = textStyle.copy(
                 fontSize = fontSize,
-                color = DefaultTextColor
+                color = noteTextColor
             ), keyboardOptions = keyboardOptions
         ) { innerTextField ->
             Box(
@@ -76,7 +62,7 @@ fun TransparentTextField(
                         text = hint,
                         style = textStyle,
                         fontSize = fontSize,
-                        color = DefaultTextColor
+                        color = noteTextColor
                     )
                 }
             }

@@ -1,14 +1,16 @@
 package com.app.noteit.feature_note.domain.repository
 
-import com.app.noteit.feature_note.domain.model.Note
+import com.app.noteit.feature_note.data.model.NoteEntity
 import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {
-    fun getNotes(): Flow<List<Note>>
+    fun fetchNotes(): Flow<List<NoteEntity>>
 
-    suspend fun getNoteById(id: Int): Note?
+    suspend fun fetchNoteById(id: Int): NoteEntity?
 
-    suspend fun deleteNote(note: Note)
+    suspend fun deleteNote(note: NoteEntity)
 
-    suspend fun insertNote(note: Note)
+    suspend fun insertNote(note: NoteEntity)
+
+    fun findNotesByQuery(searchQuery : String) : Flow<List<NoteEntity>>
 }
