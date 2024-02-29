@@ -8,7 +8,7 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="advaita.agri" />
+                  <option name="appId" value="com.app.noteit" />
                 </ConnectionSetting>
               </option>
               <option name="failureTypes">

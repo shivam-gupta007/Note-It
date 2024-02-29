@@ -16,10 +16,9 @@
         android:theme="@style/Theme.NoteIt"
         tools:targetApi="31">
         <activity
-            android:name=".feature_note.presentation.MainActivity"
+            android:name=".presentation.MainActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.NoteIt">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

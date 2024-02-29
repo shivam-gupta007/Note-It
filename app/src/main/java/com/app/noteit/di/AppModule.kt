@@ -2,9 +2,9 @@ package com.app.noteit.di
 
 import android.app.Application
 import androidx.room.Room
-import com.app.noteit.feature_note.data.data_source.local.NoteDatabase
-import com.app.noteit.feature_note.data.repository.NoteRepositoryImpl
-import com.app.noteit.feature_note.domain.repository.NoteRepository
+import com.app.noteit.data.data_source.local.NoteDatabase
+import com.app.noteit.data.repository.NoteRepositoryImpl
+import com.app.noteit.domain.repository.NoteRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
