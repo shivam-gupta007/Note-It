@@ -109,5 +109,13 @@ android {
         // Dependencies for the Crashlytics and Analytics libraries
         implementation("com.google.firebase:firebase-crashlytics")
         implementation("com.google.firebase:firebase-analytics")
+
+        // Room Testing
+        testImplementation("androidx.room:room-testing:$room_version")
+        androidTestImplementation("androidx.room:room-testing:$room_version")
+
+        // Arch Testing
+        testImplementation("androidx.arch.core:core-testing:2.2.0")
+        androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
     }
 }

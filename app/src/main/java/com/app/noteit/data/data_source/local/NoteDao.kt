@@ -14,7 +14,7 @@ interface NoteDao {
     fun getNotes(): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM note_entity WHERE id =:id")
-    suspend fun getNotesById(id: Int): NoteEntity
+    suspend fun getNotesById(id: Int): NoteEntity?
 
     @Delete
     suspend fun deleteNote(note: NoteEntity)
